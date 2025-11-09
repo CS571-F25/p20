@@ -1,5 +1,5 @@
 export default function AboutMe(props) {
-    return <div>
+    return <div className="page-content">
         <h1>About Us!</h1>
     </div>
 
