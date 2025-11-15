@@ -1,23 +1,22 @@
 import { NavLink, useNavigate } from 'react-router';
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import './Navigation.css';
 import logo from '../../assets/logo.png';
-import UserContext from "../contexts/UserContext";
+import { useAuth } from "../contexts/AuthContext";
 
 // Navigation bar
 function Navigation() {
-  const { user, setUser } = useContext(UserContext);
+  const { user, signOut } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setUser(null);
-    sessionStorage.removeItem("user");
-    setShowLogout(false);
+  const handleLogout = async () => {
+    await signOut();  // supabase logout
     setMenuOpen(false);
+    setShowLogout(false);
     navigate("/");
   };
 
@@ -35,6 +34,7 @@ function Navigation() {
         {user && (
           <ul className="nav-links">
             <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? "active-link" : undefined}>Dashboard</NavLink></li>
+            <li><NavLink to="/transactions" className={({ isActive }) => isActive ? "active-link" : undefined}>Transactions</NavLink></li>
             <li><NavLink to="/about" className={({ isActive }) => isActive ? "active-link" : undefined}>About Me</NavLink></li>
           </ul>
         )}
@@ -47,7 +47,7 @@ function Navigation() {
               onClick={() => setMenuOpen(prev => !prev)}
               style={{ cursor: "pointer" }}
             >
-              John Doe {/* todo: change this to user.name */}
+              {user.email} {/* todo: change this to user.name */}
             </span>
 
             {menuOpen && (

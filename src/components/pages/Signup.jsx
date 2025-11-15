@@ -1,46 +1,62 @@
-import { useRef, useContext } from "react"
+import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router"
-import UserContext from "../contexts/UserContext"
+import { useAuth } from "../contexts/AuthContext"
 import { Button, Form, Image } from "react-bootstrap"
 import AppCard from "../reusable/AppCard"
 import logo from "../../assets/logo.png" 
 
 export default function Signup() {
 
-    const usernameRef = useRef();
     const emailRef = useRef();
     const passwordRef = useRef();
     const confirmPasswordRef = useRef();
 
-    const { setUser } = useContext(UserContext)
+    const { signUp } = useAuth();
     const navigate = useNavigate();
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    function handleSignup(e){
+    async function handleSignup(e) {
         e.preventDefault();
 
-        const username = usernameRef.current.value.trim();
         const email = emailRef.current.value.trim();
         const password = passwordRef.current.value;
         const confirmPassword = confirmPasswordRef.current.value;
 
-        // todo: validation
-        if(!username || !email || !password || !confirmPassword){
-            alert("All fields are required.");
+        // Validation
+        if (!email || !password || !confirmPassword) {
+            setError('Please fill in all fields');
             return;
         }
 
-        if(password !== confirmPassword){
-            alert("Passwords do not match.");
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
             return;
         }
 
-        // simulate signup success
-        const newUser = { username, email };
-        setUser(newUser);
-        sessionStorage.setItem("user", JSON.stringify(newUser));
+        if (password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
 
-        alert("Signup successful!");
-        navigate("/dashboard"); // navigate after signup
+        try {
+            setError('');
+            setLoading(true);
+
+            const { data, error } = await signUp(email, password);
+
+            if (error) {
+                setError(error.message);
+            } else {
+                // Signup successful
+                alert("Signup successful! Please check your email to confirm your account.");
+                navigate("/login");
+            }
+        } catch (err) {
+            setError('Failed to create account');
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -54,14 +70,10 @@ export default function Signup() {
 
                 <h3 className="text-center mb-4">Sign Up</h3>
 
+                {/* Display error message */}
+                {error && <div className="alert alert-danger">{error}</div>}
 
                 <Form onSubmit={handleSignup}>
-
-                    {/* sign up username, email, password, confirm password fields */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Username</Form.Label>
-                        <Form.Control type="text" ref={usernameRef} />
-                    </Form.Group>
 
                     <Form.Group className="mb-3">
                         <Form.Label>Email</Form.Label>
@@ -80,10 +92,12 @@ export default function Signup() {
 
                     {/* sign up submit button */}
                     <div className="d-grid mb-2">
-                        <Button type="submit">Sign Up</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? 'Signing up...' : 'Sign Up'}
+                        </Button>
                     </div>
 
-                    {/* log in link -- link to the /login page when pressed */}
+                    {/* log in link */}
                     <div className="text-center">
                         <span>Already have an account? </span>
                         <Link to="/login">Log In</Link>

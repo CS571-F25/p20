@@ -1,45 +1,55 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
-import { useState, useEffect } from 'react';
-
+import { HashRouter, Route, Routes, Navigate } from 'react-router';
+import { useAuth, AuthProvider } from './components/contexts/AuthContext';
 import './App.css';
 
 import Navigation from './components/navigation/Navigation';
+
 import Home from './components/pages/Home';
 import AboutMe from './components/pages/AboutMe';
-import Login from './components/pages/Login';
 import Dashboard from './components/pages/Dashboard';
+import Transactions from './components/pages/Transactions'
+
+import Profile from './components/pages/Profile';
+import Settings from './components/pages/Settings';
+import Login from './components/pages/Login';
 import Signup from './components/pages/Signup'
 
-import UserContext from './components/contexts/UserContext';
+import NoMatch from './components/pages/NoMatch'
 
-function App() {
+function AppRoutes() {
+  const { user, loading } = useAuth();
 
-  // Restore the user information on website load if exists
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-    const saved = sessionStorage.getItem("user");
-    if(saved) {
-      setUser(JSON.parse(saved));
-    }
-  }, []);
+  if (loading) {
+    return <div>Loading...</div>; // or a spinner
+  }
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <BrowserRouter basename="/p20">
+    <Routes>
+      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Home />} />
+      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+      <Route path="/transactions" element={user ? <Transactions /> : <Navigate to="/login" />} />
+      <Route path="/about" element={<AboutMe />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup />} />
+      <Route path="*" element={<NoMatch />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <HashRouter>
         <Navigation />
-          <Routes>
-            <Route 
-              path="/" 
-              element={ user ? <Navigate to="/dashboard" /> : <Home /> } 
-            />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/about" element={<AboutMe />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Routes>
-      </BrowserRouter>
-    </UserContext.Provider>
+          <div style={{ paddingTop: '70px' }}>
+            <AppRoutes />
+          </div>
+      </HashRouter>
+    </AuthProvider>
   );
 }
 
 export default App;
+
