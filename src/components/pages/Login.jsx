@@ -36,7 +36,7 @@ export default function Login() {
                 setError(error.message);
             } else {
                 // Successfully logged in
-                sessionStorage.setItem("email", email);   // <--- add this
+                sessionStorage.setItem("email", email);  
                 navigate("/dashboard");
             }
         } catch (err) {

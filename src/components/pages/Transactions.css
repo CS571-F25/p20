@@ -1,22 +1,54 @@
+.search-bar-container {
+  width: 100%;
+  padding: 0 0px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  padding-left: 36px;   /* <-- moves both placeholder + typed text right */
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #000;
+}
+
+
+.search-input::placeholder {
+  color: #888;        /* softer placeholder */
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+
+/* Make the transactions page scrollable instead of body */
 .transactions-page {
   text-align: left;
-  padding: 20px;
+  padding: 12px;
   max-width: 1400px;
   margin: 0 auto;
-}
-
-.transactions-page h1 {
-  margin-bottom: 30px;
-  color: #1a202c;
-  font-size: 2em;
-}
-
-.transactions-page h3 {
-  margin-bottom: 25px;
-  margin-left: 15px;
-  color: #2d3748;
-  font-size: 1.3em;
-  font-weight: 600;
+  height: calc(100vh - 80px); /* Add this - adjust 80px based on your navbar height */
+  overflow-y: auto; /* Add this */
+  overflow-x: visible; /* Add this */
 }
 
 .transactions-content {
@@ -27,9 +59,33 @@
 
 .transactions-content > div:first-child {
   position: sticky !important;
-  top: 90px !important;
+  top: 20px !important;
   align-self: flex-start;
-  z-index: 10 !important;
+  z-index: 100 !important;
+  width: 400px; /* Add this - fixed width for the form */
+  flex-shrink: 0; /* Add this - prevent shrinking */
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1; /* This stays the same */
+  min-width: 0; /* Add this - allows proper shrinking */
+}
+
+.transactions-page h1 {
+  margin-bottom: 30px;
+  color: #1a202c;
+  font-size: 2em;
+}
+
+.transactions-page h3 {
+  margin-bottom: 14px;
+  margin-left: 5px;
+  color: #2d3748;
+  font-size: 1.3em;
+  font-weight: 600;
 }
 
 .transaction-form {
@@ -121,7 +177,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;  /* Changed from 4px to 16px */
+  padding: 8px 0 !important;  /* Changed from 4px to 16px */
   border-bottom: 1px solid #e2e8f0;  /* Add this */
   transition: background-color 0.2s ease;  /* Add this */
 }
@@ -341,68 +397,67 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  position: relative; /* Add this line */
+}
+
+.Toastify__toast-container {
+  z-index: 9999;
+}
+
+/* Standardized button styles for filters and actions */
+.btn-filter,
+.btn-clear,
+.btn-export {
+  border: none;
+  padding: 10px 16px; /* Consistent padding */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600; /* Consistent font weight */
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for all */
 }
 
 .btn-filter {
   background-color: #e2e8f0;
   color: #2d3748;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .btn-filter:hover {
   background-color: #cbd5e0;
   transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-clear {
-  background-color: #fed7d7;
-  color: #c53030;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .btn-clear:hover {
-  background-color: #fc8181;
-  color: white;
+  background-color: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(220, 38, 38, 0.2);
 }
 
 .btn-export {
   background-color: #48bb78;
   color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
 }
 
 .btn-export:hover {
   background-color: #38a169;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(72, 187, 120, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(72, 187, 120, 0.3);
+}
+
+.btn-export:active,
+.btn-filter:active,
+.btn-clear:active {
+  transform: translateY(0);
 }
 
 /* Edit button */
@@ -494,7 +549,7 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 10px;
   padding-top: 16px;
   border-top: 1px solid #e2e8f0;
 }
@@ -621,3 +676,102 @@
   transform: translateY(0);
 }
 
+.error-modal {
+  max-width: 400px;
+  padding: 32px 24px 24px 24px;
+}
+
+.error-modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.error-modal .modal-actions {
+  margin-top: 8px;
+}
+
+
+
+.filter-dropdown {
+  position: absolute;
+  top: 40px;  /* Closer to buttons */
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  margin-top: 4px;
+  z-index: 1000;
+  min-width: 200px;
+}
+
+.filter-option,
+.filter-option-active {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #334155;
+  transition: background-color 0.2s;
+  box-sizing: border-box; /* Add this */
+}
+
+.filter-option:hover {
+  background: #f1f5f9;
+}
+
+.filter-option-active {
+  background: #3b82f6 !important; /* Add !important to ensure it overrides */
+  color: white !important;
+  font-weight: 500;
+}
+
+.filter-option-active:hover {
+  background: #2563eb !important;
+  color: white !important;
+}
+
+/* Filter badges */
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #93c5fd;
+}
+
+.filter-badge button {
+  background: none;
+  border: none;
+  color: #1e40af;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0;
+  margin-left: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.filter-badge button:hover {
+  color: #1e3a8a;
+}
