@@ -8,6 +8,7 @@ import Home from './components/pages/Home';
 import AboutMe from './components/pages/AboutMe';
 import Dashboard from './components/pages/Dashboard';
 import Transactions from './components/pages/Transactions'
+import Budgets from './components/pages/Budgets';
 
 import Profile from './components/pages/Profile';
 import Settings from './components/pages/Settings';
@@ -28,6 +29,7 @@ function AppRoutes() {
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Home />} />
       <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
       <Route path="/transactions" element={user ? <Transactions /> : <Navigate to="/login" />} />
+      <Route path="/budgets" element={user ? <Budgets /> : <Navigate to="/login" />} />
       <Route path="/about" element={<AboutMe />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/settings" element={<Settings />} />
@@ -43,9 +45,7 @@ function App() {
     <AuthProvider>
       <HashRouter>
         <Navigation />
-          <div style={{ paddingTop: '70px' }}>
             <AppRoutes />
-          </div>
       </HashRouter>
     </AuthProvider>
   );

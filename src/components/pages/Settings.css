@@ -1,0 +1,221 @@
+/* Settings Page - Matching Transaction Page Style */
+.settings-page {
+  text-align: left;
+  padding: 12px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.settings-page h1 {
+  margin-bottom: 30px;
+  color: #1a202c;
+  font-size: 2em;
+  margin-left: 15px;
+}
+
+.settings-page h3 {
+  margin-bottom: 10px;
+  margin-left: 5px;
+  color: #2d3748;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+
+
+/* Setting Description */
+.setting-description {
+  color: #718096;
+  margin-bottom: 15px;
+  margin-left: 6px;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+/* Currency Select - Matching Transaction Form Input Style */
+.default-currency {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.currency-select {
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1em;
+  background-color: #ffffff;
+  color: #2d3748;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.currency-select:hover {
+  border-color: #cbd5e0;
+}
+
+.currency-select:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+/* Theme Buttons */
+.theme {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.theme-button {
+  flex: 1;
+  min-width: 160px;
+  padding: 12px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #2d3748;
+  font-weight: 500;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-button:hover {
+  border-color: #cbd5e0;
+  background-color: #f7fafc;
+}
+
+.theme-button.active {
+  border-color: #4299e1;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+/* Notifications List */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #f7fafc;
+}
+
+.notification-item.last {
+  border-bottom: none;
+}
+
+.notification-title {
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 4px;
+  font-size: 1em;
+}
+
+.notification-description {
+  font-size: 0.9em;
+  color: #718096;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 44px;
+  height: 24px;
+  background: #cbd5e0;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+  padding: 0;
+  margin-right: 15px
+}
+
+.toggle-switch.active {
+  background: #4299e1;
+}
+
+.toggle-slider {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  transform: translateX(3px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(23px);
+}
+
+.toggle-switch:hover {
+  opacity: 0.9;
+}
+
+/* Save Button Container */
+.save-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Reusing btn-add style from transactions */
+.save-button-container .btn-add {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+.save-button-container .btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+}
+
+.save-button-container .btn-add:active {
+  transform: translateY(0);
+}
+
+.save-button-container .btn-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.save-button-container .btn-add:disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}

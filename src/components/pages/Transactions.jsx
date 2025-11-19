@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import TransactionSummary from "./TransactionSummary";
 import AppCard from '../reusable/AppCard';
+import ClickOutsideWrapper from '../reusable/ClickOutsideWrapper';
 import './Transactions.css';
 
 export default function Transactions() {
@@ -14,7 +15,7 @@ export default function Transactions() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
   
   const categories = ['Food', 'Transportation', 'Entertainment', 'Shopping', 'Bills', 'Income', 'Other'];
 
@@ -53,6 +54,12 @@ export default function Transactions() {
       end: ''
     }
   });
+
+  const isFiltered =
+    filters.category !== '' ||
+    filters.type !== '' ||
+    filters.dateRange.start !== '' ||
+    filters.dateRange.end !== '';
 
   const [tempDateRange, setTempDateRange] = useState({
     start: '',
@@ -146,16 +153,24 @@ export default function Transactions() {
     const diffTime = transactionWeekStart.getTime() - thisWeekStart.getTime();
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
     
+    let weekText = null;
+
     // Compare weeks
     if (diffDays === 0) {
-      return 'This Week';
+      weekText = 'This Week';
     } else if (diffDays === -7) {
-      return 'Last Week';
+      weekText = 'Last Week';
+    }
+    
+    const weekEnd = new Date(transactionWeekStart);
+    weekEnd.setDate(transactionWeekStart.getDate() + 6);
+    
+    // Compare weeks
+    if (diffDays === 0) {
+      return `This Week (${transactionWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+    } else if (diffDays === -7) {
+      return `Last Week (${transactionWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
     } else {
-      // Format as date range
-      const weekEnd = new Date(transactionWeekStart);
-      weekEnd.setDate(transactionWeekStart.getDate() + 6);
-      
       return `${transactionWeekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     }
   };
@@ -471,19 +486,16 @@ export default function Transactions() {
     document.body.removeChild(link);
   };
 
-  const totalIncome = transactions
-  .filter(t => t.type === 'income')
-  .reduce((sum, t) => sum + Number(t.amount), 0);
-
-const totalExpense = transactions
-  .filter(t => t.type === 'expense')
-  .reduce((sum, t) => sum + Number(t.amount), 0);
-
-const balance = totalIncome - totalExpense;
-
 
   if (loading) {
-    return <div className="page-content">Loading transactions...</div>;
+      return (
+          <div className="loading-page">
+              <div className="spinner"></div>
+              <p style={{ marginTop: '16px', color: '#4f5b6cff', fontSize: '14px', marginLeft: '13px'}}>
+                  Loading transactions...
+              </p>
+          </div>
+      );
   }
 
   return (
@@ -494,13 +506,13 @@ const balance = totalIncome - totalExpense;
         <div style={{marginTop: "20px"}}>
 
           {/* Summary card */}
-          <AppCard width="400px" marginTop="3px">
-            <TransactionSummary transactions={filteredTransactions} baseCurrency={defaultCurrency} /> 
+          <AppCard width="400px" marginTop="-10px">
+            <TransactionSummary transactions={filteredTransactions} baseCurrency={defaultCurrency} isFiltered={isFiltered} filterCount={filteredTransactions.length} totalCount={transactions.length}/> 
           </AppCard>
 
           {/* Add Transaction Form */}
           <AppCard width="400px" marginTop="40px">
-          <h3>Add Transaction</h3>
+          <h3>➕ Add Transaction</h3>
             {error && <div className="error-message">{error}</div>}
             
             <div className="transaction-form">
@@ -518,6 +530,7 @@ const balance = totalIncome - totalExpense;
                   type="date" 
                   value={formData.date}
                   onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  className="modern-date-input"
                 />
               </div>
 
@@ -568,126 +581,216 @@ const balance = totalIncome - totalExpense;
           
         </div>  
 
-
-
-
         {/* Transactions History List */}
         <div className="transactions-list">
           {/* Header with Filter Buttons and Export to CSV button */}
           <div className="transactions-header">
             
-            <h3 style={{ margin: 0, marginLeft: "15px", marginTop: "17px" }}>Recent Transactions</h3>
+            <h3 style={{ margin: 0, marginLeft: "15px", marginTop: "17px" }}>📋 Recent Transactions</h3>
             
             <div className="filter-buttons">
               {/* Category Filter */}
-              <div style={{ position: 'relative' }}>
-                <button onClick={handleFilterByCategory} className="btn-filter">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                  </svg>
-                  Category
-                </button>
-                
-                {showCategoryFilter && (
-                  <div className="filter-dropdown">
-                    {categories.map(cat => (
-                      <button 
-                        key={cat}
-                        onClick={() => {
-                          setFilters({...filters, category: cat});
-                          setShowCategoryFilter(false);
-                          setCurrentPage(1);
-                        }}
-                        className={filters.category === cat ? 'filter-option-active' : 'filter-option'}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ClickOutsideWrapper onClickOutside={() => setShowCategoryFilter(false)}>
+                <div style={{ position: 'relative' }}>
+                  <button onClick={handleFilterByCategory} className="btn-filter">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Category
+                  </button>
+                  
+                  {showCategoryFilter && (
+                    <div className="filter-dropdown">
+                      {categories.map(cat => (
+                        <button 
+                          key={cat}
+                          onClick={() => {
+                            setFilters({...filters, category: cat});
+                            setShowCategoryFilter(false);
+                            setCurrentPage(1);
+                          }}
+                          className={filters.category === cat ? 'filter-option-active' : 'filter-option'}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </ClickOutsideWrapper>
 
               {/* Date Filter */}
-              <div style={{ position: 'relative' }}>
-                <button onClick={handleFilterByDateRange} className="btn-filter">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  Date
-                </button>
-                
-              {showDateFilter && (
-                <div className="filter-dropdown" style={{ minWidth: '250px' }}>
-                  <div style={{ padding: '8px' }}>
-                    <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Start Date</label>
-                    <input 
-                      type="date" 
-                      value={tempDateRange.start}
-                      max={tempDateRange.end || undefined}
-                      onChange={(e) => setTempDateRange({...tempDateRange, start: e.target.value})}
-                      style={{ width: '100%', padding: '6px', marginBottom: '12px', borderRadius: '4px', border: '1px solid #e2e8f0' }}
-                    />
-                    <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>End Date</label>
-                    <input 
-                      type="date" 
-                      value={tempDateRange.end}
-                      min={tempDateRange.start || undefined}
-                      onChange={(e) => setTempDateRange({...tempDateRange, end: e.target.value})}
-                      style={{ width: '100%', padding: '6px', marginBottom: '12px', borderRadius: '4px', border: '1px solid #e2e8f0' }}
-                    />
-                    <button 
-                      onClick={() => { 
-                        setFilters({...filters, dateRange: tempDateRange}); 
-                        setShowDateFilter(false); 
-                        setCurrentPage(1); 
-                      }}
-                      style={{ width: '100%', padding: '8px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                    >
-                      Apply
-                    </button>
-                  </div>
+              <ClickOutsideWrapper onClickOutside={() => setShowDateFilter(false)}>
+                <div style={{ position: 'relative' }}>
+                  <button onClick={handleFilterByDateRange} className="btn-filter">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Date
+                  </button>
+                  
+                  {showDateFilter && (
+                  <div className="filter-dropdown" style={{ minWidth: '250px' }}>
+                    <div style={{ padding: '8px' }}>
+                      {/* Quick Presets */}
+                      <div style={{ marginBottom: '12px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px' }}>
+                        <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '6px', fontWeight: '600' }}>Quick Select</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {[
+                            { label: 'Today', days: 0 },
+                            { label: 'Yesterday', days: 1 },
+                            { label: 'Last 7 Days', days: 7 },
+                            { label: 'Last 30 Days', days: 30 },
+                            { label: 'Last 60 Days', days: 60 },
+                            { label: 'All History', days: null }
+                          ].map((preset) => {
+                            // Check if this preset is currently active
+                            const isActive = (() => {
+                              if (preset.days === null) {
+                                return !filters.dateRange.start && !filters.dateRange.end;
+                              }
+                              
+                              const today = new Date();
+                              today.setHours(0, 0, 0, 0);
+                              const todayStr = today.toISOString().split('T')[0];
+                              
+                              if (preset.days === 0) {
+                                return filters.dateRange.start === todayStr && filters.dateRange.end === todayStr;
+                              } else if (preset.days === 1) {
+                                const yesterday = new Date(today);
+                                yesterday.setDate(today.getDate() - 1);
+                                const yesterdayStr = yesterday.toISOString().split('T')[0];
+                                return filters.dateRange.start === yesterdayStr && filters.dateRange.end === yesterdayStr;
+                              } else {
+                                const startDate = new Date(today);
+                                startDate.setDate(today.getDate() - preset.days);
+                                const startStr = startDate.toISOString().split('T')[0];
+                                return filters.dateRange.start === startStr && filters.dateRange.end === todayStr;
+                              }
+                            })();
+                            
+                            return (
+                              <button
+                                key={preset.label}
+                                onClick={() => {
+                                  const today = new Date();
+                                  today.setHours(0, 0, 0, 0);
+                                  
+                                  if (preset.days === null) {
+                                    setFilters({...filters, dateRange: { start: '', end: '' }});
+                                    setShowDateFilter(false);
+                                    setCurrentPage(1);
+                                  } else if (preset.days === 0) {
+                                    const todayStr = today.toISOString().split('T')[0];
+                                    setFilters({...filters, dateRange: { start: todayStr, end: todayStr }});
+                                    setShowDateFilter(false);
+                                    setCurrentPage(1);
+                                  } else if (preset.days === 1) {
+                                    const yesterday = new Date(today);
+                                    yesterday.setDate(today.getDate() - 1);
+                                    const yesterdayStr = yesterday.toISOString().split('T')[0];
+                                    setFilters({...filters, dateRange: { start: yesterdayStr, end: yesterdayStr }});
+                                    setShowDateFilter(false);
+                                    setCurrentPage(1);
+                                  } else {
+                                    const startDate = new Date(today);
+                                    startDate.setDate(today.getDate() - preset.days);
+                                    setFilters({
+                                      ...filters,
+                                      dateRange: {
+                                        start: startDate.toISOString().split('T')[0],
+                                        end: today.toISOString().split('T')[0]
+                                      }
+                                    });
+                                    setShowDateFilter(false);
+                                    setCurrentPage(1);
+                                  }
+                                }}
+                                className={isActive ? 'filter-option-active' : 'filter-option'}
+                              >
+                                {preset.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Custom Date Range */}
+                      <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '6px', fontWeight: '600' }}>Custom Range</label>
+                      <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Start Date</label>
+                      <input 
+                        type="date" 
+                        value={tempDateRange.start}
+                        max={tempDateRange.end || undefined}
+                        onChange={(e) => setTempDateRange({...tempDateRange, start: e.target.value})}
+                        style={{ width: '100%', padding: '6px', marginBottom: '12px', borderRadius: '4px', border: '1px solid #e2e8f0' }}
+                      />
+                      <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>End Date</label>
+                      <input 
+                        type="date" 
+                        value={tempDateRange.end}
+                        min={tempDateRange.start || undefined}
+                        onChange={(e) => setTempDateRange({...tempDateRange, end: e.target.value})}
+                        style={{ width: '100%', padding: '6px', marginBottom: '12px', borderRadius: '4px', border: '1px solid #e2e8f0' }}
+                      />
+                      <button 
+                        onClick={() => {
+                          setFilters({...filters, dateRange: tempDateRange});
+                          setShowDateFilter(false);
+                          setCurrentPage(1);
+                        }}
+                        style={{ width: '100%', padding: '8px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        Apply Custom Range
+                      </button>
+                    </div>
+                  </div>)}
                 </div>
-              )}
-              </div>
+              </ClickOutsideWrapper>
 
               {/* Type Filter */}
-              <div style={{ position: 'relative' }}>
-                <button onClick={handleFilterByType} className="btn-filter">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <polyline points="19 12 12 19 5 12"></polyline>
-                  </svg>
-                  Type
-                </button>
-                
-                {showTypeFilter && (
-                  <div className="filter-dropdown">
-                    <button 
-                      onClick={() => { setFilters({...filters, type: 'expense'}); setShowTypeFilter(false); setCurrentPage(1); }}
-                      className={filters.type === 'expense' ? 'filter-option-active' : 'filter-option'}
-                    >
-                      Expense
-                    </button>
-                    <button 
-                      onClick={() => { setFilters({...filters, type: 'income'}); setShowTypeFilter(false); setCurrentPage(1); }}
-                      className={filters.type === 'income' ? 'filter-option-active' : 'filter-option'}
-                    >
-                      Income
-                    </button>
-                  </div>
-                )}
-              </div>
+              <ClickOutsideWrapper onClickOutside={() => setShowTypeFilter(false)}>
+                <div style={{ position: 'relative' }}>
+                  <button onClick={handleFilterByType} className="btn-filter">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                    Type
+                  </button>
+                  
+                  {showTypeFilter && (
+                    <div className="filter-dropdown">
+                      <button 
+                        onClick={() => { setFilters({...filters, type: 'expense'}); setShowTypeFilter(false); setCurrentPage(1); }}
+                        className={filters.type === 'expense' ? 'filter-option-active' : 'filter-option'}
+                      >
+                        Expense
+                      </button>
+                      <button 
+                        onClick={() => { setFilters({...filters, type: 'income'}); setShowTypeFilter(false); setCurrentPage(1); }}
+                        className={filters.type === 'income' ? 'filter-option-active' : 'filter-option'}
+                      >
+                        Income
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </ClickOutsideWrapper>
               
-              <button onClick={handleClearFilters} className="btn-clear">
+              {isFiltered && (
+                <button onClick={handleClearFilters} className="btn-clear">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
                 Clear
               </button>
+              )}
+              
               
               <button onClick={exportToCSV} className="btn-export">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -730,7 +833,7 @@ const balance = totalIncome - totalExpense;
           </div>
 
           {/* Active Filter Badges */}
-          {(filters.category || filters.type || filters.dateRange.start) && (
+          {(isFiltered) && (
             <div style={{ marginBottom: '4px', marginLeft: '15px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {filters.category && (
                 <span className="filter-badge">
@@ -756,7 +859,7 @@ const balance = totalIncome - totalExpense;
           )}
 
           <AppCard width="100%">
-             {transactions.length === 0 ? (
+            {transactions.length === 0 ? (
                 <p className="empty-state">No transactions yet. Add your first one!</p>
               ) : filteredTransactions.length === 0 ? (
                 <div className="empty-state">
@@ -805,7 +908,7 @@ const balance = totalIncome - totalExpense;
                         <span style={{
                           fontSize: '14px', 
                           fontWeight: '600', 
-                          color: (weekLabel === 'This Week' || weekLabel === 'Last Week') ? '#3d7bdfff' : '#576475ff', // Blue for recent weeks
+                          color: (weekLabel.includes('This Week') || weekLabel.includes('Last Week')) ? '#3d7bdfff' : '#576475ff', // Blue for recent weeks
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px'
                         }}>
@@ -842,7 +945,8 @@ const balance = totalIncome - totalExpense;
                                     type="date" 
                                     value={editFormData.date}
                                     onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
-                                    className="edit-input-small"
+                                    className="edit-input-small modern-date-input"
+                                    max={new Date().toISOString().split('T')[0]}
                                   />
                                 </div>
                               </div>
@@ -850,7 +954,7 @@ const balance = totalIncome - totalExpense;
                               <>
                                 <strong>{transaction.description}</strong>
                                 <div className="transaction-details">
-                                  {transaction.category} • {transaction.date}
+                                  {transaction.category} • {new Date(transaction.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                                 </div>
                               </>
                             )}
@@ -933,6 +1037,10 @@ const balance = totalIncome - totalExpense;
                   ));
                 })()}
               </div>
+              {currentPage == totalPages && (
+                <div className="end-of-list">
+                  <p>------ End of transaction list ------</p>
+                </div>)}
 
               {/* Pagination */}
                 {totalPages > 1 && (

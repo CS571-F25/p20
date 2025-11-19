@@ -49,12 +49,14 @@
   height: calc(100vh - 80px); /* Add this - adjust 80px based on your navbar height */
   overflow-y: auto; /* Add this */
   overflow-x: visible; /* Add this */
+  margin-top: 8px;
 }
 
 .transactions-content {
   display: flex;
   gap: 40px;
   align-items: flex-start;
+  margin-top: 10px;
 }
 
 .transactions-content > div:first-child {
@@ -64,6 +66,13 @@
   z-index: 100 !important;
   width: 400px; /* Add this - fixed width for the form */
   flex-shrink: 0; /* Add this - prevent shrinking */
+}
+
+.end-of-list {
+  color: #a0aec0;
+  font-style: italic;
+  text-align: center;
+  margin: 0;
 }
 
 .transactions-list {
@@ -117,12 +126,17 @@
 /* Force calendar icon to display */
 .transaction-form input[type="date"]::-webkit-calendar-picker-indicator {
   display: block !important;
-  opacity: 1 !important;
+  opacity: 0.6 !important;
   cursor: pointer !important;
-  background: transparent !important;
-  color: #2d3748 !important;
+  filter: invert(0.5) !important;
   width: 20px !important;
   height: 20px !important;
+  transition: opacity 0.2s, filter 0.2s !important;
+}
+
+.transaction-form input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1 !important;
+  filter: invert(0.3) !important;
 }
 
 .transaction-form input[type="date"]::-moz-calendar-picker-indicator {
@@ -163,13 +177,6 @@
 
 .btn-add:active {
   transform: translateY(0);
-}
-
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  flex: 1;
 }
 
 /* Change from padding: 4px 0; to: */
@@ -422,25 +429,27 @@
 }
 
 .btn-filter {
-  background-color: #e2e8f0;
-  color: #2d3748;
+  background-color: #4299e1;
+  color: white;
 }
 
+
 .btn-filter:hover {
-  background-color: #cbd5e0;
+  background-color: #3182ce;
   transform: translateY(-1px);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-clear {
-  background-color: #fee2e2;
+  background-color: #efc4c4;
   color: #dc2626;
+  transition: all 0.25s ease;
 }
 
 .btn-clear:hover {
-  background-color: #fecaca;
+  background-color: #e4a3a3;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(220, 38, 38, 0.2);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
 }
 
 .btn-export {
@@ -774,4 +783,58 @@
 
 .filter-badge button:hover {
   color: #1e3a8a;
+}
+
+/* Modern Date Picker Styles */
+.modern-date-input {
+  position: relative;
+  cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.modern-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  filter: invert(0.5);
+  transition: opacity 0.2s;
+}
+
+.modern-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  filter: invert(0.3);
+}
+
+.modern-date-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-color: #3b82f6;
+}
+
+/* Style the date input text */
+.modern-date-input::-webkit-datetime-edit {
+  padding: 0;
+}
+
+.modern-date-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.modern-date-input::-webkit-datetime-edit-text {
+  color: #64748b;
+  padding: 0 2px;
+}
+
+.modern-date-input::-webkit-datetime-edit-month-field,
+.modern-date-input::-webkit-datetime-edit-day-field,
+.modern-date-input::-webkit-datetime-edit-year-field {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.modern-date-input::-webkit-datetime-edit-month-field:focus,
+.modern-date-input::-webkit-datetime-edit-day-field:focus,
+.modern-date-input::-webkit-datetime-edit-year-field:focus {
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 2px;
 }

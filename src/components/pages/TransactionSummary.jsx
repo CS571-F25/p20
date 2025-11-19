@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function TransactionSummary({ transactions, baseCurrency }) {
+export default function TransactionSummary({ transactions, baseCurrency, isFiltered, totalCount, filterCount }) {
   const [rates, setRates] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -44,26 +44,41 @@ export default function TransactionSummary({ transactions, baseCurrency }) {
 
   return (
     <div className="transaction-summary">
-      <h3 style={{ marginBottom: "15px", marginLeft: "0px" }}>Summary ({baseCurrency})</h3>
+       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: "15px" }}>
+        <h3 style={{ margin: 0 }}>Summary ({baseCurrency})</h3>
+        {isFiltered && (
+          <span style={{
+            fontSize: '11px',
+            backgroundColor: '#dbeafe',
+            color: '#1e40af',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            fontWeight: '600',
+            border: '1px solid #93c5fd'
+          }}>
+            Filtered ({filterCount}/{totalCount})
+          </span>
+        )}
+      </div>
       <div 
         className="summary-item" 
         style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}
       >
-        <span>Total Income:</span> 
+        <span>💰 Total Income:</span> 
         <strong style={{ color: incomeColor }}>{totalIncome.toFixed(2)}</strong>
       </div>
       <div 
         className="summary-item" 
         style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}
       >
-        <span>Total Expenses:</span> 
+        <span>💸 Total Expenses:</span> 
         <strong style={{ color: expenseColor }}>{totalExpense.toFixed(2)}</strong>
       </div>
       <div 
         className="summary-item" 
         style={{ display: "flex", justifyContent: "space-between" }}
       >
-        <span>Balance:</span> 
+        <span>📊 Balance:</span> 
         <strong style={{ color: balanceColor }}>{balance.toFixed(2)}</strong>
       </div>
     </div>
