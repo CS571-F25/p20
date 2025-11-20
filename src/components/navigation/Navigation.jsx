@@ -39,7 +39,6 @@ function Navigation() {
               <li><NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>Dashboard</NavLink></li>
               <li><NavLink to="/transactions" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>Transactions</NavLink></li>
               <li><NavLink to="/budgets" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>Budgets</NavLink></li>
-              <li><NavLink to="/about" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>About Me</NavLink></li>
             </ul>
           )}
         </div>
@@ -63,6 +62,7 @@ function Navigation() {
                   <div className="user-dropdown" role="menu">
                     <div onClick={() => { navigate('/profile'); setMenuOpen(false); }}>👤 Profile</div>
                     <div onClick={() => { navigate('/settings'); setMenuOpen(false); }}>⚙ Settings</div>
+                    <div onClick={() => { navigate('/about'); setMenuOpen(false); }}>ℹ About Us</div>
                     <div 
                       onClick={() => setShowLogout(true)} 
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
@@ -89,7 +89,7 @@ function Navigation() {
               )}
             </div>
           ) : (
-            <NavLink to="/login" className="nav-login">Login</NavLink>
+            <NavLink to="/login" className="nav-login">Login / Signup</NavLink>
           )}
         </div>
 

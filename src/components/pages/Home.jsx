@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import { useRef, useState } from "react"
+import { Link, useNavigate } from "react-router"
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -449,7 +451,10 @@ export default function Home() {
               and visualize your spending patterns—all in one intuitive platform.
             </p>
             <div className="hero-buttons">
-              <button className="btn-primary">Start Tracking Free →</button>
+              <button className="btn-primary" onClick={()=>{
+                navigate("/signup");
+              }}
+              >Start Tracking Free →</button>
               <button className="btn-secondary">See How It Works</button>
             </div>
             <div className="hero-stats">
@@ -609,7 +614,9 @@ export default function Home() {
               Join thousands managing their finances better with WalletPalz.
               Start tracking today—completely free.
             </p>
-            <button className="btn-cta">Get Started Now</button>
+            <button className="btn-cta" onClick={()=>{
+              navigate("/signup");
+            }}>Get Started Now</button>
             <p className="cta-note">No credit card required • Free forever</p>
           </div>
         </section>
