@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router";
 import { User, Mail, Calendar, Wallet, Target, LogOut, Trash2, Edit, Lock, Download, Upload, X } from "lucide-react";
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../../supabaseClient';
@@ -11,6 +12,7 @@ import './Profile.css';
 export default function Profile(props) {
   const { user } = useAuth();
   const { settings } = useSettings();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [rates, setRates] = useState({});
@@ -351,6 +353,10 @@ export default function Profile(props) {
         
         if (error) throw error;
 
+        await supabase.auth.signOut();
+        localStorage.clear();
+        sessionStorage.clear();
+
         toast.success('Account deleted successfully', {
         position: "top-right",
         autoClose: 2000,
@@ -363,7 +369,7 @@ export default function Profile(props) {
         // Don't call signOut() - user is already deleted
         // Just redirect to home after a short delay
         setTimeout(() => {
-        window.location.href = '/';
+          navigate("/")
         }, 2000);
 
     } catch (error) {
