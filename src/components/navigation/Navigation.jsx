@@ -4,6 +4,7 @@ import { Modal, Button } from "react-bootstrap";
 import './Navigation.css';
 import logo from '../../assets/logo.png';
 import { useAuth } from "../contexts/AuthContext";
+import NotificationBell from '../notifications/NotificationBell';
 import ClickOutsideWrapper from '../reusable/ClickOutsideWrapper';
 
 function Navigation() {
@@ -45,6 +46,7 @@ function Navigation() {
 
         {/* RIGHT: User / Login */}
         <div className="nav-right">
+          {user && <NotificationBell />}
           {user ? (
             <div className="user-menu-container">
               <button
@@ -54,15 +56,14 @@ function Navigation() {
                 aria-expanded={menuOpen}
               >
                 {user?.user_metadata?.full_name || user?.name || user?.email}
-                <span className="chev">&#x25BE;</span>
               </button>
 
               {menuOpen && (
                 <ClickOutsideWrapper onClickOutside={() => setMenuOpen(false)}>
                   <div className="user-dropdown" role="menu">
-                    <div onClick={() => { navigate('/profile'); setMenuOpen(false); }}>👤 Profile</div>
-                    <div onClick={() => { navigate('/settings'); setMenuOpen(false); }}>⚙ Settings</div>
-                    <div onClick={() => { navigate('/about'); setMenuOpen(false); }}>ℹ About Us</div>
+                    <div onClick={() => { navigate('/profile'); setMenuOpen(false); }}>Profile</div>
+                    <div onClick={() => { navigate('/settings'); setMenuOpen(false); }}>Settings</div>
+                    <div onClick={() => { navigate('/about'); setMenuOpen(false); }}>About Us</div>
                     <div 
                       onClick={() => setShowLogout(true)} 
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}

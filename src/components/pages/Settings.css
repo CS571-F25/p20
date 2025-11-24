@@ -1,7 +1,7 @@
 /* Settings Page - Matching Transaction Page Style */
 .settings-page {
   text-align: left;
-  padding: 12px;
+  padding: 30px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -218,4 +218,79 @@
 .save-button-container .btn-add:disabled:hover {
   transform: none;
   box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h3 {
+  color: #2d3748;
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-bottom: 16px;
+  margin-left: 0;
+}
+
+.modal-description {
+  color: #4a5568;
+  font-size: 0.95em;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.modal-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.modal-button.cancel {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.modal-button.cancel:hover {
+  background: #cbd5e0;
+}
+
+.modal-button.confirm {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+.modal-button.confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
 }

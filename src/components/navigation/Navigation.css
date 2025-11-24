@@ -1,6 +1,6 @@
 /* NAVBAR WRAPPER */
 .navbar {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   width: 100%;
@@ -112,13 +112,15 @@
 }
 
 .nav-login:hover {
-  background: rgba(255,255,255,0.12);
+  background: rgba(210, 166, 166, 0.12);
+  color: #fff; 
   transform: translateY(-2px);
 }
 
 /* USER MENU BUTTON */
 .user-menu-container {
   position: relative;
+  
 }
 
 .user-menu-button {
@@ -136,7 +138,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 220px;
+  width: 100%;
+  transition: background 140ms ease, transform 120ms ease;
+
 }
 
 /* Chevron rotate */
@@ -146,6 +150,11 @@
 
 .user-menu-button[aria-expanded="true"] .chev {
   transform: rotate(180deg);
+}
+
+.user-menu-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
 }
 
 /* DROPDOWN */

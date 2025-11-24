@@ -1,14 +1,27 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router"
+import trackTransactionsImg from '../../assets/transactions.png';
+import budgetImg from '../../assets/budget.png';
+import notiImg from '../../assets/notifications.png';
+import logo from '../../assets/logo.png';
+
 
 export default function Home() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <style>{`
+        .navbar {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          z-index: 1000 !important;
+        }
+
         .landing-page {
+          padding-top: 80px; /* Prevent content from hiding under navbar */
           background-color: #f7fafc;
           color: #2d3748;
           line-height: 1.6;
@@ -448,14 +461,14 @@ export default function Home() {
             </h1>
             <p className="hero-description">
               Take control of your finances with WalletPalz. Track transactions, set smart budgets,
-              and visualize your spending patterns—all in one intuitive platform.
+              and visualize your spending patterns. All in one intuitive platform.
             </p>
             <div className="hero-buttons">
               <button className="btn-primary" onClick={()=>{
                 navigate("/signup");
               }}
               >Start Tracking Free →</button>
-              <button className="btn-secondary">See How It Works</button>
+              <button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView()}>See How It Works</button>
             </div>
             <div className="hero-stats">
               <div className="hero-stat">✓ Free to use</div>
@@ -582,26 +595,39 @@ export default function Home() {
           <div className="screenshot-grid">
             <div className="screenshot-card">
               <h3 className="screenshot-title">📝 Transaction Tracking</h3>
-              <div className="image-placeholder">
-                Transaction List View<br />
-                <small style={{ opacity: 0.7 }}>Filter, search, and manage all your transactions</small>
-              </div>
+              <img 
+                src={trackTransactionsImg} 
+                alt="Transaction tracking interface"
+                style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              />
             </div>
 
             <div className="screenshot-card">
-              <h3 className="screenshot-title">🎯 Budget Dashboard</h3>
-              <div className="image-placeholder">
-                Budget Progress View<br />
-                <small style={{ opacity: 0.7 }}>Visual progress bars and daily spending alerts</small>
-              </div>
+              <h3 className="screenshot-title">🎯 Budgeting</h3>
+              <img 
+                  src={budgetImg} 
+                  alt="Budget tracking interface"
+                  style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                />
             </div>
+          </div>
 
+          <div className="screenshot-grid">
             <div className="screenshot-card">
               <h3 className="screenshot-title">📊 Analytics Charts</h3>
               <div className="image-placeholder">
                 Spending Trends Graph<br />
                 <small style={{ opacity: 0.7 }}>Weekly and monthly spending breakdowns</small>
               </div>
+            </div>
+
+            <div className="screenshot-card">
+              <h3 className="screenshot-title">🔔 Get Notified!</h3>
+              <img 
+                  src={notiImg} 
+                  alt="Notification dropdown interface"
+                  style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                />
             </div>
           </div>
         </section>
@@ -611,8 +637,8 @@ export default function Home() {
           <div className="cta-container">
             <h2 className="cta-title">Ready to Take Control?</h2>
             <p className="cta-description">
-              Join thousands managing their finances better with WalletPalz.
-              Start tracking today—completely free.
+              Join us now and manage your finances better with WalletPalz.
+              Start tracking today. Completely free!
             </p>
             <button className="btn-cta" onClick={()=>{
               navigate("/signup");
@@ -627,7 +653,7 @@ export default function Home() {
             <div className="footer-grid">
               <div>
                 <div className="footer-brand">
-                  <div className="footer-logo">💰</div>
+                  <img src={logo} alt="Logo" className="nav-logo" />
                   <span className="footer-brand-text">WalletPalz</span>
                 </div>
                 <p className="footer-description">
@@ -636,7 +662,7 @@ export default function Home() {
               </div>
 
               <div>
-                <h4 className="footer-title">Features</h4>
+                <h4 className="footer-title" id="feature">Features</h4>
                 <ul className="footer-links">
                   <li><a href="#features">Transaction Tracking</a></li>
                   <li><a href="#features">Budget Management</a></li>
@@ -649,23 +675,19 @@ export default function Home() {
                 <ul className="footer-links">
                   <li><a href="#">About Us</a></li>
                   <li><a href="#">Privacy Policy</a></li>
-                  <li><a href="#">Terms of Service</a></li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="footer-title">Support</h4>
                 <ul className="footer-links">
-                  <li><a href="#">Help Center</a></li>
                   <li><a href="#">Contact Us</a></li>
-                  <li><a href="#">FAQ</a></li>
+                  <li><a href="#">Send Us Feedback</a></li>
                 </ul>
               </div>
             </div>
 
-            <div className="footer-bottom">
-              © 2024 WalletPalz. All rights reserved. Made with 💚 for better financial wellness.
-            </div>
+
           </div>
         </footer>
       </div>

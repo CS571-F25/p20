@@ -3,19 +3,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../../supabaseClient';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useSettings } from '../contexts/SettingsContext';
 import TransactionSummary from "./TransactionSummary";
 import AppCard from '../reusable/AppCard';
 import ClickOutsideWrapper from '../reusable/ClickOutsideWrapper';
+import { triggerNotification } from '../notifications/triggerNotification';
 import './Transactions.css';
 
 export default function Transactions() {
   const { user } = useAuth();
+  const { settings } = useSettings();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState(null);
   const itemsPerPage = 20;
+  const [searchQuery, setSearchQuery] = useState('');
   
   const categories = ['Food', 'Transportation', 'Entertainment', 'Shopping', 'Bills', 'Income', 'Other'];
 
@@ -27,7 +30,7 @@ export default function Transactions() {
   ];
 
   // Default currency
-  const defaultCurrency = 'USD';
+  const defaultCurrency = settings.currency;
 
   // Create array with default on top and rest alphabetized
   const currencies = [
@@ -37,7 +40,7 @@ export default function Transactions() {
 
   // State variable for transaction form
   const [formData, setFormData] = useState({
-    date: '',
+    date: new Date().toISOString().split("T")[0],
     description: '',
     category: '',
     amount: '',
@@ -59,15 +62,14 @@ export default function Transactions() {
     filters.category !== '' ||
     filters.type !== '' ||
     filters.dateRange.start !== '' ||
-    filters.dateRange.end !== '';
+    filters.dateRange.end !== '' ||
+    searchQuery !== ''
 
   const [tempDateRange, setTempDateRange] = useState({
     start: '',
     end: ''
   });
 
-  // search query filter
-  const [searchQuery, setSearchQuery] = useState('');
 
   // State variable for delete confirmation modal
   const [deleteModal, setDeleteModal] = useState({
@@ -258,7 +260,15 @@ export default function Transactions() {
       if (error) throw error;
 
       // Add to local state
-      setTransactions([data[0], ...transactions]);
+      const updatedTransactions = [data[0], ...transactions];
+      updatedTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setTransactions(updatedTransactions);
+    
+      // notifications!
+      if (formData.type === 'expense') {
+        await triggerNotification(user.id, updatedTransactions, defaultCurrency);
+      }
+
       toast.success('Transaction added successfully!', {
         position: "top-right",
         autoClose: 2000, // disappears after 2 seconds
@@ -304,7 +314,7 @@ export default function Transactions() {
       // Remove from local state
       setTransactions(transactions.filter(t => t.id !== deleteModal.transactionId));
       closeDeleteModal();
-      toast.success('Transaction deleted', {
+      toast.success('Transaction deleted successfully!', {
         position: "top-right",
         autoClose: 2000, // disappears after 2 seconds
         hideProgressBar: true,
@@ -380,10 +390,19 @@ export default function Transactions() {
       if (error) throw error;
 
       // Update local state
-      setTransactions(transactions.map(t => 
+      const updatedTransactions = transactions.map(t => 
         t.id === id ? { ...t, ...editFormData, amount } : t
-      ));
-      toast.info('Transaction updated', {
+      );
+      updatedTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setTransactions(updatedTransactions);
+      
+      // Check budget notifications with updated transactions
+      if (editFormData.type === 'expense') {
+        await triggerNotification(user.id, updatedTransactions, defaultCurrency);
+      }
+
+      toast.info('Transaction updated successfully!', {
         position: "top-right",
         autoClose: 2000, // disappears after 2 seconds
         hideProgressBar: true,
@@ -503,10 +522,9 @@ export default function Transactions() {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="transactions-content">
         
-        <div style={{marginTop: "20px"}}>
-
+        <div>
           {/* Summary card */}
-          <AppCard width="400px" marginTop="-10px">
+          <AppCard width="400px">
             <TransactionSummary transactions={filteredTransactions} baseCurrency={defaultCurrency} isFiltered={isFiltered} filterCount={filteredTransactions.length} totalCount={transactions.length}/> 
           </AppCard>
 
@@ -577,8 +595,6 @@ export default function Transactions() {
               </button>
             </div>   
           </AppCard>
-
-          
         </div>  
 
         {/* Transactions History List */}
@@ -855,6 +871,12 @@ export default function Transactions() {
                 <button onClick={() => setFilters({...filters, dateRange: {start: '', end: ''}})}>✕</button>
               </span>
               )}
+              {searchQuery !== '' && (
+                <span className="filter-badge">
+                {`Search: "${searchQuery}"`}
+                <button onClick={() => setSearchQuery('')}>✕</button>
+              </span>
+              )}
             </div>
           )}
 
@@ -946,7 +968,6 @@ export default function Transactions() {
                                     value={editFormData.date}
                                     onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
                                     className="edit-input-small modern-date-input"
-                                    max={new Date().toISOString().split('T')[0]}
                                   />
                                 </div>
                               </div>

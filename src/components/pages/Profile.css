@@ -1,0 +1,414 @@
+/* Profile Page */
+.profile-page {
+  text-align: left;
+  padding: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.profile-page h1 {
+  margin-bottom: 30px;
+  color: #1a202c;
+  font-size: 2em;
+  margin-left: 15px;
+}
+
+.profile-page h3 {
+  color: #2d3748;
+  font-size: 1.3em;
+  font-weight: 600;
+  margin-bottom: 16px;
+  margin-left: 5px;
+}
+
+/* Profile Card */
+.profile-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-icon {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.profile-info h2 {
+  color: #2d3748;
+  font-size: 1.8em;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.profile-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #718096;
+  font-size: 0.95em;
+}
+
+.profile-member-since {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #718096;
+  font-size: 0.95em;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #718096;
+}
+
+.stat-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.stat-label span {
+  font-size: 0.9em;
+}
+
+.stat-value {
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+/* Actions List */
+.actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-button {
+  padding: 14px 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  color: #2d3748;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-button:hover {
+  border-color: #cbd5e0;
+  background-color: #f7fafc;
+}
+
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-button.sign-out {
+  border-color: #fed7d7;
+  color: #e53e3e;
+}
+
+.action-button.sign-out:hover {
+  border-color: #fc8181;
+  background-color: #fff5f5;
+}
+
+.action-button.delete-account {
+  border-color: #feb2b2;
+  color: #c53030;
+}
+
+.action-button.delete-account:hover {
+  border-color: #fc8181;
+  background-color: #fff5f5;
+}
+
+.button-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h3 {
+  color: #2d3748;
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-bottom: 20px;
+  margin-left: 0;
+}
+
+.modal-description {
+  color: #718096;
+  font-size: 0.95em;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #2d3748;
+  font-size: 0.95em;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1em;
+  color: #2d3748; /* This should work, but add background too */
+  background-color: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.form-helper {
+  margin-top: 6px;
+  font-size: 0.85em;
+  color: #718096;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.modal-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.modal-button.cancel {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.modal-button.cancel:hover {
+  background: #cbd5e0;
+}
+
+.modal-button.confirm {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
+}
+
+.modal-button.confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
+}
+
+.modal-button.confirm-delete {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(229, 62, 62, 0.3);
+}
+
+.modal-button.confirm-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4);
+}
+
+.modal-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Avatar Upload Section */
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 2px dashed #e2e8f0;
+}
+
+.current-avatar {
+  flex-shrink: 0;
+}
+
+.edit-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #7db4e1;
+}
+
+.edit-avatar-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-upload-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.upload-button,
+.remove-button {
+  padding: 10px 16px; /* Make padding consistent */
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px; /* Fixed height */
+}
+
+.upload-button {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white !important;
+  border: none;
+  margin-left: 8px; 
+
+}
+
+.upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+}
+
+.remove-button {
+  background: white;
+  color: #e53e3e;
+  border: 2px solid #feb2b2;
+  margin-left: 8px; 
+
+}
+
+.remove-button:hover {
+  background: #fff5f5;
+  border-color: #fc8181;
+}
+
+.remove-button:disabled,
+.upload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.button-icon-small {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px; /* Add this */
+
+}
+
+.profile-avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}

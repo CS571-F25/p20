@@ -1,5 +1,6 @@
 import { HashRouter, Route, Routes, Navigate } from 'react-router';
 import { useAuth, AuthProvider } from './components/contexts/AuthContext';
+import { SettingsProvider } from './components/contexts/SettingsContext';
 import './App.css';
 
 import Navigation from './components/navigation/Navigation';
@@ -21,7 +22,14 @@ function AppRoutes() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>; // or a spinner
+      return (
+          <div className="loading-page">
+              <div className="spinner"></div>
+              <p style={{ marginTop: '16px', color: '#4f5b6cff', fontSize: '14px', marginLeft: '13px'}}>
+                  Loading App...
+              </p>
+          </div>
+      );
   }
 
   return (
@@ -31,7 +39,7 @@ function AppRoutes() {
       <Route path="/transactions" element={user ? <Transactions /> : <Navigate to="/login" />} />
       <Route path="/budgets" element={user ? <Budgets /> : <Navigate to="/login" />} />
       <Route path="/about" element={<AboutMe />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile" element={user ? <Profile /> : <Navigate to="/" />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup />} />
@@ -43,10 +51,14 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <HashRouter>
-        <Navigation />
-            <AppRoutes />
-      </HashRouter>
+      <SettingsProvider>
+        <HashRouter>
+          <Navigation />
+          <main className="main-content">
+              <AppRoutes />
+          </main>
+        </HashRouter>
+      </SettingsProvider>
     </AuthProvider>
   );
 }
