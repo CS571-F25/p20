@@ -1,106 +1,438 @@
-import "../../App.css";
+import { useEffect, useMemo, useState } from "react";
 import {
-    LineChart,
-    Line,
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Tooltip,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Legend,
-    Cell,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Tooltip,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  Cell,
 } from "recharts";
+import { supabase } from "../../supabaseClient";
+import { useAuth } from "../contexts/AuthContext";
+import { useSettings } from "../contexts/SettingsContext";
+import { fetchExchangeRates, convertToBase } from "../reusable/currencyConverter";
+import "./Dashboard.css";
+
+const CATEGORY_COLORS = ["#2563eb", "#22c55e", "#f97316", "#a855f7", "#06b6d4", "#ef4444"];
+const RADIAN = Math.PI / 180;
 
 export default function Dashboard() {
-    // Placeholder data
-    const monthlyData = [
-        { month: "Jan", spending: 400 },
-        { month: "Feb", spending: 350 },
-        { month: "Mar", spending: 500 },
-        { month: "Apr", spending: 300 },
-        { month: "May", spending: 600 },
-    ];
+  const { user } = useAuth();
+  const { settings } = useSettings();
+  const [transactions, setTransactions] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [rates, setRates] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const weeklyData = [
-        { day: "Mon", amount: 50 },
-        { day: "Tue", amount: 75 },
-        { day: "Wed", amount: 40 },
-        { day: "Thu", amount: 90 },
-        { day: "Fri", amount: 60 },
-    ];
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user, settings.currency]);
 
-    const categoryData = [
-        { name: "Food", value: 300 },
-        { name: "Transport", value: 150 },
-        { name: "Shopping", value: 200 },
-        { name: "Bills", value: 250 },
-    ];
+  const loadDashboardData = async () => {
+    setLoading(true);
+    setError("");
 
-    const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"];
+    try {
+      const [txRes, budgetRes, exchangeRates] = await Promise.all([
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("date", { ascending: false }),
+        supabase
+          .from("budgets")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("start_date", { ascending: false }),
+        fetchExchangeRates(settings.currency || "USD"),
+      ]);
 
+      if (txRes.error) throw txRes.error;
+      if (budgetRes.error) throw budgetRes.error;
+
+      setTransactions(txRes.data || []);
+      setBudgets(budgetRes.data || []);
+      setRates(exchangeRates || {});
+    } catch (err) {
+      console.error("Error loading dashboard data:", err);
+      setError("We could not load your dashboard data. Please refresh.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatAmount = (value = 0) => {
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: settings.currency || "USD",
+        maximumFractionDigits: 2,
+      }).format(value);
+    } catch (e) {
+      return `${settings.currency || "USD"} ${Number(value).toFixed(2)}`;
+    }
+  };
+
+  const toBaseAmount = (transaction) => {
+    const amount = Math.abs(Number(transaction.amount) || 0);
+    const currency = transaction.currency || settings.currency || "USD";
+    if (!rates[currency]) return amount;
+    return convertToBase(amount, currency, rates);
+  };
+
+  const totals = useMemo(() => {
+    let income = 0;
+    let expense = 0;
+
+    transactions.forEach((t) => {
+      const amt = toBaseAmount(t);
+      if (t.type === "income") {
+        income += amt;
+      } else {
+        expense += amt;
+      }
+    });
+
+    return {
+      income,
+      expense,
+      balance: income - expense,
+    };
+  }, [transactions, rates, settings.currency]);
+
+  const monthlyTrend = useMemo(() => {
+    const buckets = {};
+    transactions.forEach((t) => {
+      const date = new Date(`${t.date}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return;
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!buckets[key]) {
+        buckets[key] = {
+          month: date.toLocaleString("en-US", { month: "short" }),
+          income: 0,
+          expense: 0,
+        };
+      }
+      const amt = toBaseAmount(t);
+      if (t.type === "income") {
+        buckets[key].income += amt;
+      } else {
+        buckets[key].expense += amt;
+      }
+    });
+
+    const result = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i -= 1) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      result.push({
+        month: d.toLocaleString("en-US", { month: "short" }),
+        income: buckets[key]?.income || 0,
+        expense: buckets[key]?.expense || 0,
+      });
+    }
+    return result;
+  }, [transactions, rates, settings.currency]);
+
+  const categoryBreakdown = useMemo(() => {
+    const totalsByCategory = {};
+    transactions.forEach((t) => {
+      if (t.type !== "expense") return;
+      const category = t.category || "Other";
+      totalsByCategory[category] = (totalsByCategory[category] || 0) + toBaseAmount(t);
+    });
+
+    return Object.entries(totalsByCategory)
+      .map(([name, value]) => ({ name, value: Number(value.toFixed(2)) }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6);
+  }, [transactions, rates, settings.currency]);
+
+  const budgetProgress = useMemo(() => {
+    const today = new Date();
+
+    return budgets
+      .map((budget) => {
+        const spent = transactions
+          .filter((t) => t.type === "expense")
+          .filter((t) => budget.categories?.includes(t.category))
+          .filter((t) => {
+            const date = new Date(`${t.date}T00:00:00`);
+            const start = new Date(`${budget.start_date}T00:00:00`);
+            const end = new Date(`${budget.end_date}T00:00:00`);
+            return date >= start && date <= end;
+          })
+          .reduce((sum, t) => sum + toBaseAmount(t), 0);
+
+        const remaining = (budget.limit || 0) - spent;
+        const percent = budget.limit ? Math.min(100, (spent / budget.limit) * 100) : 0;
+        const daysLeft = Math.ceil(
+          (new Date(`${budget.end_date}T00:00:00`) - today) / (1000 * 60 * 60 * 24)
+        );
+
+        return {
+          ...budget,
+          spent,
+          remaining,
+          percent,
+          daysLeft,
+        };
+      })
+      .sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
+  }, [budgets, transactions, rates, settings.currency]);
+
+  const recentTransactions = useMemo(
+    () =>
+      transactions.slice(0, 5).map((t) => ({
+        ...t,
+        baseAmount: toBaseAmount(t),
+        displayDate: new Date(`${t.date}T00:00:00`).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+      })),
+    [transactions, rates, settings.currency]
+  );
+
+  if (loading) {
     return (
-        <div className="dashboard-wrapper">
-            <div className="dashboard-box">
-                <h1>Dashboard</h1>
-                <p>Your spending overview</p>
-
-                {/* TOTAL SPENDING CARD */}
-                <div className="single-card">
-                    <h2>Total Spending</h2>
-                    <h1 style={{ color: "#2a4d69" }}>$1,250</h1>
-                </div>
-
-                {/* MONTHLY SPENDING */}
-                <div className="single-card">
-                    <h3>Monthly Spending</h3>
-                    <LineChart width={600} height={300} data={monthlyData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="spending" stroke="#8884d8" strokeWidth={3} />
-                    </LineChart>
-                </div>
-
-                {/* WEEKLY SPENDING */}
-                <div className="single-card">
-                    <h3>Weekly Spending</h3>
-                    <BarChart width={600} height={300} data={weeklyData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="day" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="amount" fill="#82ca9d" />
-                    </BarChart>
-                </div>
-
-                {/* CATEGORIES PIE */}
-                <div className="single-card">
-                    <h3>Spending Categories</h3>
-                    <PieChart width={400} height={300}>
-                        <Pie
-                            data={categoryData}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={100}
-                            dataKey="value"
-                            label
-                        >
-                            {categoryData.map((entry, index) => (
-                                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                    </PieChart>
-                </div>
-
-            </div>
-        </div>
+      <div className="loading-page">
+        <div className="spinner"></div>
+        <p style={{ marginTop: "16px", color: "#4f5b6cff", fontSize: "14px", marginLeft: "13px" }}>
+          Loading dashboard...
+        </p>
+      </div>
     );
+  }
 
+  return (
+    <div className="dashboard-page">
+      <div className="dashboard-header">
+        <div>
+          <p className="eyebrow">Overview • Base currency {settings.currency}</p>
+          <h1>Dashboard</h1>
+          <p className="muted">A quick look at your money, budgets, and recent activity.</p>
+        </div>
+        <button className="refresh-btn" onClick={loadDashboardData}>
+          Refresh
+        </button>
+      </div>
+
+      {error && <div className="error-banner">{error}</div>}
+
+      <div className="metric-grid">
+        <div className="metric-card primary">
+          <span className="label">Balance</span>
+          <h2>{formatAmount(totals.balance)}</h2>
+          <p className="muted">
+            Income {formatAmount(totals.income)} • Expenses {formatAmount(totals.expense)}
+          </p>
+        </div>
+        <div className="metric-card">
+          <span className="label">Income (30d)</span>
+          <h3>
+            {formatAmount(
+              transactions
+                .filter((t) => t.type === "income")
+                .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+                .reduce((sum, t) => sum + toBaseAmount(t), 0)
+            )}
+          </h3>
+          <p className="muted">Last 30 days</p>
+        </div>
+        <div className="metric-card">
+          <span className="label">Expenses (30d)</span>
+          <h3>
+            {formatAmount(
+              transactions
+                .filter((t) => t.type === "expense")
+                .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+                .reduce((sum, t) => sum + toBaseAmount(t), 0)
+            )}
+          </h3>
+          <p className="muted">Last 30 days</p>
+        </div>
+        <div className="metric-card">
+          <span className="label">Active Budgets</span>
+          <h3>{budgetProgress.filter((b) => b.daysLeft >= 0).length}</h3>
+          <p className="muted">{budgets.length} total budgets</p>
+        </div>
+      </div>
+
+      <div className="chart-row">
+        <div className="chart-card">
+          <div className="card-header">
+            <div>
+              <h3>Monthly Trend</h3>
+              <p className="muted">Income vs. expenses (last 6 months)</p>
+            </div>
+          </div>
+          <div style={{ width: "100%", height: 260 }}>
+            <ResponsiveContainer>
+              <LineChart data={monthlyTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="income" stroke="#22c55e" strokeWidth={3} dot={false} />
+                <Line type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={3} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <div className="card-header">
+            <div>
+              <h3>Spending by Category</h3>
+              <p className="muted">Top categories (expenses)</p>
+            </div>
+          </div>
+          <div className="category-grid">
+            <div style={{ width: "100%", height: 240 }}>
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={categoryBreakdown}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={90}
+                    labelLine={false}
+                    label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                      // place labels inside to avoid clipping
+                      const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill="#fff"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize={12}
+                          fontWeight="600"
+                        >
+                          {`${Math.round(percent * 100)}%`}
+                        </text>
+                      );
+                    }}
+                  >
+                    {categoryBreakdown.map((entry, index) => (
+                      <Cell key={entry.name} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="category-list">
+              {categoryBreakdown.length === 0 ? (
+                <p className="muted">No expenses yet.</p>
+              ) : (
+                categoryBreakdown.map((item, index) => (
+                  <div key={item.name} className="category-row">
+                    <span className="dot" style={{ background: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }}></span>
+                    <div>
+                      <p className="label">{item.name}</p>
+                      <p className="muted">{formatAmount(item.value)}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="chart-row">
+        <div className="chart-card wide">
+          <div className="card-header">
+            <div>
+              <h3>Budget Health</h3>
+              <p className="muted">Spending against your limits</p>
+            </div>
+          </div>
+          {budgetProgress.length === 0 ? (
+            <p className="muted">You have not created any budgets yet.</p>
+          ) : (
+            <div className="budget-list">
+              {budgetProgress.slice(0, 4).map((budget) => (
+                <div key={budget.id} className="budget-row">
+                  <div className="budget-row-header">
+                    <div>
+                      <p className="label">{budget.categories?.join(", ") || "Uncategorized"}</p>
+                      <p className="muted">
+                        {budget.start_date} - {budget.end_date}
+                      </p>
+                    </div>
+                    <div className="budget-amounts">
+                      <span>{formatAmount(budget.spent)} spent</span>
+                      <span className="muted">of {formatAmount(budget.limit || 0)}</span>
+                    </div>
+                  </div>
+                  <div className="progress">
+                    <div
+                      className={`progress-fill ${budget.percent > 90 ? "danger" : budget.percent > 70 ? "warn" : "ok"}`}
+                      style={{ width: `${budget.percent}%` }}
+                    ></div>
+                  </div>
+                  <div className="budget-meta">
+                    <span>{Math.max(0, Math.round(budget.percent))}% used</span>
+                    <span className={budget.remaining < 0 ? "danger-text" : ""}>
+                      {budget.remaining < 0
+                        ? `${formatAmount(Math.abs(budget.remaining))} over`
+                        : `${formatAmount(budget.remaining)} left`}
+                    </span>
+                    <span>{budget.daysLeft >= 0 ? `${budget.daysLeft} days left` : "Ended"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="chart-card narrow">
+          <div className="card-header">
+            <div>
+              <h3>Recent Transactions</h3>
+              <p className="muted">Latest activity</p>
+            </div>
+          </div>
+          {recentTransactions.length === 0 ? (
+            <p className="muted">No transactions yet.</p>
+          ) : (
+            <div className="recent-list">
+              {recentTransactions.map((t) => (
+                <div key={t.id} className="recent-row">
+                  <div>
+                    <p className="label">{t.description}</p>
+                    <p className="muted">
+                      {t.category || "Uncategorized"} • {t.displayDate}
+                    </p>
+                  </div>
+                  <span className={t.type === "income" ? "income" : "expense"}>
+                    {t.type === "income" ? "+" : "-"}
+                    {formatAmount(t.baseAmount)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
