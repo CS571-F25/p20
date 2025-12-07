@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../../supabaseClient';
 import ClickOutsideWrapper from '../reusable/ClickOutsideWrapper';
@@ -10,6 +10,8 @@ function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
   // Fetch notifications
   useEffect(() => {
@@ -64,6 +66,31 @@ function NotificationBell() {
     };
   }, [user]);
 
+  // Handle keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
+  // Focus management when dropdown opens
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const firstButton = dropdownRef.current.querySelector('button');
+      if (firstButton) {
+        firstButton.focus();
+      }
+    }
+  }, [isOpen]);
+
   const markAsRead = async (notificationId) => {
     await supabase
       .from('notifications')
@@ -71,29 +98,28 @@ function NotificationBell() {
       .eq('id', notificationId);
   };
 
-    const markAllAsRead = async () => {
-        await supabase
-            .from('notifications')
-            .update({ read: true })
-            .eq('user_id', user.id)
-            .eq('read', false);
-        
-        // Update local state to mark all as read
-        setNotifications(prev => 
-            prev.map(n => ({ ...n, read: true }))
-        );
-        setUnreadCount(0);
-    };
+  const markAllAsRead = async () => {
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    
+    setNotifications(prev => 
+      prev.map(n => ({ ...n, read: true }))
+    );
+    setUnreadCount(0);
+  };
 
-    const clearAllNotifications = async () => {
-        await supabase
-        .from('notifications')
-        .delete()
-        .eq('user_id', user.id);
-        
-        setNotifications([]);
-        setUnreadCount(0);
-    };
+  const clearAllNotifications = async () => {
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', user.id);
+    
+    setNotifications([]);
+    setUnreadCount(0);
+  };
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -104,9 +130,24 @@ function NotificationBell() {
       case 'savings_goal_achieved':
         return '🎉';
       case 'budget_milestone':
-        return '🎯'
+        return '🎯';
       default:
         return '🔔';
+    }
+  };
+
+  const getNotificationIconLabel = (type) => {
+    switch (type) {
+      case 'budget_exceeded':
+        return 'Alert';
+      case 'budget_warning':
+        return 'Warning';
+      case 'savings_goal_achieved':
+        return 'Celebration';
+      case 'budget_milestone':
+        return 'Milestone';
+      default:
+        return 'Notification';
     }
   };
 
@@ -116,9 +157,9 @@ function NotificationBell() {
     const seconds = Math.floor((now - then) / 1000);
 
     if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
     return then.toLocaleDateString();
   };
 
@@ -127,48 +168,76 @@ function NotificationBell() {
   return (
     <div className="notification-bell-container">
       <button
+        ref={buttonRef}
         className="notification-bell-button"
         onClick={() => setIsOpen(prev => !prev)}
-        aria-label="Notifications"
+        aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
-        <span style={{ 
-        fontSize: '20px',
-        filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
-        }}>🔔</span>
+        <span 
+          style={{ 
+            fontSize: '20px',
+            filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+          }}
+          aria-hidden="true"
+        >
+          🔔
+        </span>
         
         {unreadCount > 0 && (
-          <span className="notification-badge">{unreadCount}</span>
+          <span className="notification-badge" aria-hidden="true">
+            {unreadCount}
+          </span>
         )}
       </button>
 
       {isOpen && (
         <ClickOutsideWrapper onClickOutside={() => setIsOpen(false)}>
-          <div className="notification-dropdown">
+          <div 
+            ref={dropdownRef}
+            className="notification-dropdown" 
+            role="region"
+            aria-label="Notifications panel"
+          >
             <div className="notification-header">
-              <h3>Notifications</h3>
-                {unreadCount > 0 ? (
-                  <button onClick={markAllAsRead} className="mark-all-read">
-                    Mark all read
-                  </button>
-                ): 
-                notifications.length > 0 ? (
-                  <button onClick={clearAllNotifications} className="clear-all-button">
-                    Clear all
-                  </button>
-                ): null}
+              <h3 id="notification-heading">Notifications</h3>
+              {unreadCount > 0 ? (
+                <button 
+                  onClick={markAllAsRead} 
+                  className="mark-all-read"
+                  aria-label="Mark all notifications as read"
+                >
+                  Mark all read
+                </button>
+              ) : notifications.length > 0 ? (
+                <button 
+                  onClick={clearAllNotifications} 
+                  className="clear-all-button"
+                  aria-label="Clear all notifications"
+                >
+                  Clear all
+                </button>
+              ) : null}
             </div>
 
-            <div className="notification-list">
+            <div 
+              className="notification-list" 
+              role="list"
+              aria-labelledby="notification-heading"
+            >
               {loading ? (
-                <div className="notification-empty">Loading...</div>
+                <div className="notification-empty" role="status" aria-live="polite">
+                  Loading notifications...
+                </div>
               ) : notifications.length === 0 ? (
-                <div className="notification-empty">
-                  <span style={{ fontSize: '2rem' }}>🔔</span>
+                <div className="notification-empty" role="status">
+                  <span style={{ fontSize: '2rem' }} aria-hidden="true">🔔</span>
                   <p>No notifications yet</p>
                 </div>
               ) : (
                 notifications.map((notification) => (
-                  <div
+                  <button
                     key={notification.id}
                     className={`notification-item ${!notification.read ? 'unread' : ''}`}
                     onClick={() => {
@@ -176,8 +245,10 @@ function NotificationBell() {
                         markAsRead(notification.id);
                       }
                     }}
+                    role="listitem"
+                    aria-label={`${notification.title}. ${notification.message}. ${formatTimeAgo(notification.created_at)}${!notification.read ? '. Unread' : ''}`}
                   >
-                    <div className="notification-icon">
+                    <div className="notification-icon" aria-label={getNotificationIconLabel(notification.type)}>
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="notification-content">
@@ -187,14 +258,29 @@ function NotificationBell() {
                         {formatTimeAgo(notification.created_at)}
                       </div>
                     </div>
-                    {!notification.read && <div className="notification-dot"></div>}
-                  </div>
+                    {!notification.read && (
+                      <>
+                        <div className="notification-dot" aria-hidden="true"></div>
+                        <span className="sr-only">Unread</span>
+                      </>
+                    )}
+                  </button>
                 ))
               )}
             </div>
           </div>
         </ClickOutsideWrapper>
       )}
+      
+      {/* Live region for screen reader announcements */}
+      <div 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true" 
+        className="sr-only"
+      >
+        {unreadCount > 0 && `${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`}
+      </div>
     </div>
   );
 }

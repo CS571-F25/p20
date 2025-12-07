@@ -21,14 +21,22 @@ function Navigation() {
     navigate("/");
   };
 
+  // Handle keyboard navigation in dropdown
+  const handleKeyDown = (e, action) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   return (
-    <nav className="navbar">
+    <nav className="navbar" role="navigation" aria-label="Main navigation">
       <div className="nav-container">
 
         {/* LEFT: Brand */}
         <div className="nav-left">
-          <NavLink to="/" className="brand-container">
-            <img src={logo} alt="Logo" className="nav-logo" />
+          <NavLink to="/" className="brand-container" aria-label="WalletPalz home">
+            <img src={logo} alt="WalletPalz logo" className="nav-logo" />
             <h2 className="nav-brand">WalletPalz</h2>
           </NavLink>
         </div>
@@ -54,18 +62,43 @@ function Navigation() {
                 onClick={() => setMenuOpen(prev => !prev)}
                 aria-haspopup="true"
                 aria-expanded={menuOpen}
+                aria-label="User menu"
               >
                 {user?.user_metadata?.full_name || user?.name || user?.email}
               </button>
 
               {menuOpen && (
                 <ClickOutsideWrapper onClickOutside={() => setMenuOpen(false)}>
-                  <div className="user-dropdown" role="menu">
-                    <div onClick={() => { navigate('/profile'); setMenuOpen(false); }}>Profile</div>
-                    <div onClick={() => { navigate('/settings'); setMenuOpen(false); }}>Settings</div>
-                    <div onClick={() => { navigate('/about'); setMenuOpen(false); }}>About Us</div>
+                  <div className="user-dropdown" role="menu" aria-label="User menu options">
                     <div 
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => { navigate('/profile'); setMenuOpen(false); }}
+                      onKeyDown={(e) => handleKeyDown(e, () => { navigate('/profile'); setMenuOpen(false); })}
+                    >
+                      Profile
+                    </div>
+                    <div 
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => { navigate('/settings'); setMenuOpen(false); }}
+                      onKeyDown={(e) => handleKeyDown(e, () => { navigate('/settings'); setMenuOpen(false); })}
+                    >
+                      Settings
+                    </div>
+                    {/* <div 
+                      role="menuitem"
+                      tabIndex={0}
+                      onClick={() => { navigate('/about'); setMenuOpen(false); }}
+                      onKeyDown={(e) => handleKeyDown(e, () => { navigate('/about'); setMenuOpen(false); })}
+                    >
+                      About Us
+                    </div> */}
+                    <div 
+                      role="menuitem"
+                      tabIndex={0}
                       onClick={() => setShowLogout(true)} 
+                      onKeyDown={(e) => handleKeyDown(e, () => setShowLogout(true))}
                       style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
                     >
                       <svg 
@@ -78,6 +111,7 @@ function Navigation() {
                         strokeWidth="2" 
                         strokeLinecap="round" 
                         strokeLinejoin="round"
+                        aria-hidden="true"
                       >
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                         <polyline points="16 17 21 12 16 7"/>

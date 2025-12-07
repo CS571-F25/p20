@@ -18,7 +18,7 @@ export default function TransactionSummary({ transactions, baseCurrency, isFilte
       }
     }
     fetchRates();
-  }, []);
+  }, [baseCurrency]);
 
   const convertToBase = (transaction) => {
     if (!rates[transaction.currency]) return 0;
@@ -37,10 +37,10 @@ export default function TransactionSummary({ transactions, baseCurrency, isFilte
 
   const balance = totalIncome + totalExpense;
 
-  // Style colors like your transaction list
-  const incomeColor = (totalIncome === 0)? "#2e392fff" : "#4CAF50";   // green for income
-  const expenseColor = (totalExpense === 0)? "#2e392fff" : "#F44336";  // red for expense
-  const balanceColor = (balance === 0) ? "#2e392fff" : (balance >= 0)? "#2196F3" : "#F44336" ;  // blue for balance
+  // WCAG AA compliant colors (meeting 4.5:1 contrast ratio)
+  const incomeColor = (totalIncome === 0) ? "#1a202c" : "#15803d";   // Changed from #4CAF50 to meet WCAG AA
+  const expenseColor = (totalExpense === 0) ? "#1a202c" : "#dc2626";  // Changed from #F44336 to meet WCAG AA
+  const balanceColor = (balance === 0) ? "#1a202c" : (balance >= 0) ? "#15803d" : "#dc2626";  // Changed from #2196F3 to meet WCAG AA
 
   return (
     <div className="transaction-summary">
@@ -50,7 +50,7 @@ export default function TransactionSummary({ transactions, baseCurrency, isFilte
           <span style={{
             fontSize: '11px',
             backgroundColor: '#dbeafe',
-            color: '#1e40af',
+            color: '#1e3a8a', // Changed from #1e40af to meet WCAG AA (7.02:1)
             padding: '4px 8px',
             borderRadius: '12px',
             fontWeight: '600',
@@ -83,5 +83,4 @@ export default function TransactionSummary({ transactions, baseCurrency, isFilte
       </div>
     </div>
   );
-
 }

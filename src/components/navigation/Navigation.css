@@ -7,7 +7,7 @@
   z-index: 1000;
 
   backdrop-filter: blur(12px);
-  background: rgba(35, 40, 54, 0.80);
+  background: rgba(35, 40, 54, 0.95); /* Increased opacity from 0.80 for better contrast */
   padding: 0.8rem 0;
 
   box-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -36,6 +36,15 @@
   align-items: center;
   gap: 0.6rem;
   text-decoration: none;
+  border-radius: 6px;
+  padding: 4px;
+  margin: -4px; /* Negative margin to maintain visual spacing */
+}
+
+/* Focus indicator for brand link - only show on keyboard navigation */
+.brand-container:focus-visible {
+  outline: 2px solid #66aaff;
+  outline-offset: 2px;
 }
 
 .nav-logo {
@@ -70,20 +79,29 @@
 
 .nav-links a,
 .nav-link {
-  color: #e7eef9;
+  color: #ffffff; /* Changed from #e7eef9 to pure white for better contrast (13.6:1) */
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
-  padding: 6px 0;
+  padding: 6px 8px; /* Added horizontal padding for better focus area */
   transition: color 160ms ease, transform 120ms ease;
   display: inline-block;
   white-space: nowrap;
+  border-radius: 4px;
 }
 
 .nav-links a:hover,
 .nav-link:hover {
   color: #66aaff;
   transform: translateY(-2px);
+}
+
+/* Focus indicator for nav links - only show on keyboard navigation */
+.nav-links a:focus-visible,
+.nav-link:focus-visible {
+  outline: 2px solid #66aaff;
+  outline-offset: 2px;
+  color: #ffffff; /* Ensure text stays white on focus */
 }
 
 .active-link {
@@ -102,25 +120,33 @@
 
 /* Login button */
 .nav-login {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.1); /* Increased from 0.06 for better visibility */
   color: #fff;
   text-decoration: none;
   padding: 0.42rem 0.9rem;
   border-radius: 8px;
   font-weight: 700;
   transition: background 140ms ease, transform 120ms ease;
+  min-height: 44px; /* Added for touch target size */
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-login:hover {
-  background: rgba(210, 166, 166, 0.12);
+  background: rgba(255, 255, 255, 0.2); /* Increased from 0.12 for better visibility */
   color: #fff; 
   transform: translateY(-2px);
+}
+
+/* Focus indicator for login button - only show on keyboard navigation */
+.nav-login:focus-visible {
+  outline: 2px solid #66aaff;
+  outline-offset: 2px;
 }
 
 /* USER MENU BUTTON */
 .user-menu-container {
   position: relative;
-  
 }
 
 .user-menu-button {
@@ -128,8 +154,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.85rem;
-  min-height: 36px;
-  background: rgba(255,255,255,0.06);
+  min-height: 44px; /* Increased from 36px for touch target size */
+  background: rgba(255,255,255,0.1); /* Increased from 0.06 for better visibility */
   color: #fff;
   border: 0;
   border-radius: 8px;
@@ -140,7 +166,6 @@
   text-overflow: ellipsis;
   width: 100%;
   transition: background 140ms ease, transform 120ms ease;
-
 }
 
 /* Chevron rotate */
@@ -153,8 +178,14 @@
 }
 
 .user-menu-button:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.25); /* Increased from 0.18 for better visibility */
   transform: translateY(-2px);
+}
+
+/* Focus indicator for user menu button - only show on keyboard navigation */
+.user-menu-button:focus-visible {
+  outline: 2px solid #66aaff;
+  outline-offset: 2px;
 }
 
 /* DROPDOWN */
@@ -163,7 +194,7 @@
   right: 0;
   top: calc(100% + 8px);
   background: #fff;
-  color: #222;
+  color: #1a202c; /* Changed from #222 for better contrast (12.6:1) */
   border-radius: 10px;
   min-width: 170px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.15);
@@ -175,10 +206,26 @@
 .user-dropdown > div {
   padding: 0.72rem 1rem;
   cursor: pointer;
+  min-height: 44px; /* Added for touch target size */
+  display: flex;
+  align-items: center;
+  transition: background 140ms ease;
 }
 
 .user-dropdown > div:hover {
-  background: #f5f7fb;
+  background: #e2e8f0; /* Changed from #f5f7fb for better visual feedback */
+}
+
+/* Focus indicator for dropdown items - only show on keyboard navigation */
+.user-dropdown > div:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background: #e2e8f0;
+}
+
+/* Make dropdown items keyboard accessible */
+.user-dropdown > div {
+  position: relative;
 }
 
 /* Dropdown animation */

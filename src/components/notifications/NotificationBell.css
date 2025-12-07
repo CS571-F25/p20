@@ -18,6 +18,11 @@
   transition: background 140ms ease, transform 120ms ease;
 }
 
+.notification-bell-button:focus-visible {
+  outline: 3px solid #66aaff;
+  outline-offset: 2px;
+}
+
 .notification-bell-button svg {
   color: #fff !important;
   stroke: #fff !important;
@@ -86,7 +91,7 @@
 .mark-all-read {
   background: none;
   border: none;
-  color: #66aaff;
+  color: #0066cc; /* Changed from #66aaff for better contrast */
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -98,7 +103,7 @@
 .clear-all-button {
   background: none;
   border: none;
-  color: #f73636;
+  color: #c92a2a; /* Changed from #f73636 for better contrast */
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -108,11 +113,21 @@
 }
 
 .mark-all-read:hover {
-  background: rgba(102, 170, 255, 0.1);
+  background: rgba(0, 102, 204, 0.1);
+}
+
+.mark-all-read:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
 }
 
 .clear-all-button:hover {
-  background: rgba(212, 83, 40, 0.1);
+  background: rgba(201, 42, 42, 0.1);
+}
+
+.clear-all-button:focus-visible {
+  outline: 2px solid #c92a2a;
+  outline-offset: 2px;
 }
 
 /* Notification List */
@@ -137,7 +152,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem 1rem;
-  color: #999;
+  color: #666; /* Changed from #999 for better contrast */
   text-align: center;
 }
 
@@ -158,9 +173,19 @@
   position: relative;
   margin-left: 15px;
   margin-right: 15px;
+  border: none;
+  background: none;
+  width: calc(100% - 30px);
+  text-align: left;
 }
 
 .notification-item:hover {
+  background: #f8f9fa;
+}
+
+.notification-item:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: -2px;
   background: #f8f9fa;
 }
 
@@ -181,12 +206,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 /* Content */
 .notification-content {
   flex: 1;
   min-width: 0;
+  pointer-events: none;
 }
 
 .notification-title {
@@ -198,14 +225,14 @@
 
 .notification-message {
   font-size: 0.875rem;
-  color: #666;
+  color: #4a4a4a; /* Changed from #666 for better contrast */
   line-height: 1.4;
   margin-bottom: 0.35rem;
 }
 
 .notification-time {
   font-size: 0.75rem;
-  color: #999;
+  color: #707070; /* Changed from #999 for better contrast */
 }
 
 /* Unread Dot */
@@ -215,8 +242,22 @@
   right: 1.2rem;
   width: 8px;
   height: 8px;
-  background: #66aaff;
+  background: #0066cc;
   border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Animation */

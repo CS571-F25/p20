@@ -65,34 +65,81 @@ export default function Signup() {
             <AppCard width="450px">
                 {/* Logo at the top */}
                 <div className="text-center mb-3">
-                    <Image src={logo} alt="Logo" height={120} width={120} />
+                    <Image 
+                        src={logo} 
+                        alt="Budget tracking application logo" 
+                        height={120} 
+                        width={120} 
+                    />
                 </div>
 
-                <h3 className="text-center mb-4">Sign Up</h3>
+                <h1 className="text-center mb-4" style={{ fontSize: '1.75rem' }}>Sign Up</h1>
 
                 {/* Display error message */}
-                {error && <div className="alert alert-danger">{error}</div>}
+                {error && (
+                    <div 
+                        className="alert alert-danger" 
+                        role="alert"
+                        aria-live="assertive"
+                    >
+                        {error}
+                    </div>
+                )}
 
-                <Form onSubmit={handleSignup}>
+                <Form onSubmit={handleSignup} noValidate>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" ref={emailRef} />
+                        <Form.Label htmlFor="signup-email">Email</Form.Label>
+                        <Form.Control 
+                            id="signup-email"
+                            type="email" 
+                            ref={emailRef}
+                            autoComplete="email"
+                            required
+                            aria-required="true"
+                            aria-describedby={error ? "signup-error" : undefined}
+                        />
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type="password" ref={passwordRef} />
+                        <Form.Label htmlFor="signup-password">Password</Form.Label>
+                        <Form.Control 
+                            id="signup-password"
+                            type="password" 
+                            ref={passwordRef}
+                            autoComplete="new-password"
+                            required
+                            aria-required="true"
+                            aria-describedby="password-requirements"
+                        />
+                        <Form.Text id="password-requirements" className="text-muted">
+                            Password must be at least 6 characters
+                        </Form.Text>
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                        <Form.Label>Confirm Password</Form.Label>
-                        <Form.Control type="password" ref={confirmPasswordRef} />
+                        <Form.Label htmlFor="signup-confirm-password">Confirm Password</Form.Label>
+                        <Form.Control 
+                            id="signup-confirm-password"
+                            type="password" 
+                            ref={confirmPasswordRef}
+                            autoComplete="new-password"
+                            required
+                            aria-required="true"
+                            aria-describedby={error ? "signup-error" : undefined}
+                        />
                     </Form.Group>
+
+                    {/* Hidden error ID for aria-describedby */}
+                    {error && <div id="signup-error" className="visually-hidden">{error}</div>}
 
                     {/* sign up submit button */}
                     <div className="d-grid mb-2">
-                        <Button type="submit" disabled={loading}>
+                        <Button 
+                            type="submit" 
+                            disabled={loading}
+                            aria-busy={loading}
+                        >
                             {loading ? 'Signing up...' : 'Sign Up'}
                         </Button>
                     </div>

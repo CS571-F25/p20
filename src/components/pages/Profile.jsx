@@ -436,13 +436,17 @@ export default function Profile(props) {
         {/* Stats Cards */}
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-label">
-              <Wallet className="stat-icon" />
-              <span>Total Balance ({settings.currency})</span>
-            </div>
-            <p className="stat-value" style={{color: (profileData.totalBalance === 0) ? "#2e392fff" : (profileData.totalBalance >= 0)? "#4CAF50" : "#F44336"}}>
-                {profileData.totalBalance.toFixed(2).toLocaleString()}</p>
+          <div className="stat-label">
+            <Wallet className="stat-icon" />
+            <span>Total Balance ({settings.currency})</span>
           </div>
+          <p className="stat-value" style={{
+            color: (profileData.totalBalance === 0) ? "#1a202c" : 
+                  (profileData.totalBalance >= 0) ? "#15803d" : "#dc2626"
+          }}>
+            {profileData.totalBalance.toFixed(2).toLocaleString()}
+          </p>
+        </div>
 
           <div className="stat-card">
             <div className="stat-label">

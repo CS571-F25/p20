@@ -46,7 +46,7 @@ export default function Budgets() {
       setRates(exchangeRates);
     }
     loadRates();
-  }, []);
+  }, [settings.currency]);
 
   const fetchBudgets = async () => {
     try {
@@ -90,7 +90,6 @@ export default function Budgets() {
           transactionDate <= endDate;
       })
       .reduce((sum, t) => {
-        // Convert each transaction to the default currency
         const convertedAmount = convertToBase(Math.abs(t.amount), t.currency || 'USD', rates);
         return sum + convertedAmount;
       }, 0);
@@ -117,7 +116,8 @@ export default function Budgets() {
       return {
         status: 'expired',
         message: 'Budget period has ended',
-        color: '#718096',
+        color: '#1a202c', // Darker text for better contrast
+        backgroundColor: '#e2e8f0', // Light gray background
         icon: '⏱️'
       };
     }
@@ -127,7 +127,8 @@ export default function Budgets() {
       return {
         status: 'over',
         message: `Exceeded by ${overspent.toFixed(2)}`,
-        color: '#ef4444',
+        color: '#991b1b', // Darker red for better contrast
+        backgroundColor: '#fee2e2', // Very light red background
         icon: '🚫',
         spent,
         remaining: -overspent,
@@ -138,8 +139,9 @@ export default function Budgets() {
     if (daysRemaining === 0) {
       return {
         status: 'lastday',
-        message: remaining > 0 ? `$${remaining.toFixed(2)} left` : 'At budget',
-        color: remaining > 0 ? '#3b82f6' : '#48bb78',
+        message: remaining > 0 ? `${remaining.toFixed(2)} left` : 'At budget',
+        color: remaining > 0 ? '#2563eb' : '#15803d', // Changed #3b82f6 and #48bb78 to meet WCAG AA
+        backgroundColor: remaining > 0 ? '#dbeafe' : '#d1fae5', // Solid background instead of transparent
         icon: '🎯',
         spent,
         remaining,
@@ -150,8 +152,9 @@ export default function Budgets() {
     const dailyBudget = remaining / daysRemaining;
     return {
       status: 'good',
-      message: `$${dailyBudget.toFixed(2)}/day left`,
-      color: percentSpent >= 80 ? '#f59e0b' : '#48bb78',
+      message: `${dailyBudget.toFixed(2)}/day left`,
+      color: percentSpent >= 80 ? '#92400e' : '#15803d', // Changed #d97706 to #92400e for WCAG AA (7.01:1)
+      backgroundColor: percentSpent >= 80 ? '#fef3c7' : '#d1fae5', // Solid background instead of transparent
       icon: percentSpent >= 80 ? '⚠️' : '✅',
       spent,
       remaining,
@@ -256,7 +259,7 @@ export default function Budgets() {
     return (
       <div className="loading-page">
         <div className="spinner"></div>
-        <p style={{ marginTop: '16px', color: '#4f5b6cff', fontSize: '14px', marginLeft: '13px'}}>
+        <p style={{ marginTop: '16px', color: '#4a5568', fontSize: '14px', marginLeft: '13px'}}>
           Loading budgets...
         </p>
       </div>
@@ -269,7 +272,7 @@ export default function Budgets() {
       <h3 style={{
         marginBottom: "14px",
         marginLeft: "15px",
-        color: "#2d3748",
+        color: "#1a202c",
         fontSize: "1.3em",
         fontWeight: "600"
       }}>💰 Your Budgets ({settings.currency})</h3>
@@ -299,8 +302,9 @@ export default function Budgets() {
                     budgetId: budget.id,
                     budgetCategories: budget.categories
                   })}
+                  aria-label={`Delete budget for ${budget.categories.join(', ')}`}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                     <path d="M3 6h18"></path>
                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
@@ -324,7 +328,7 @@ export default function Budgets() {
                     </div>
                   </div>
 
-                  <div className="budget-progress-bar-container">
+                  <div className="budget-progress-bar-container" role="progressbar" aria-valuenow={Math.min(status.percentSpent, 100)} aria-valuemin="0" aria-valuemax="100" aria-label={`Budget usage: ${Math.min(status.percentSpent, 100).toFixed(0)}%`}>
                     <div 
                       className="budget-progress-bar-fill"
                       style={{
@@ -334,8 +338,8 @@ export default function Budgets() {
                     ></div>
                   </div>
 
-                  <div className="budget-status-badge" style={{ backgroundColor: `${status.color}15`, color: status.color }}>
-                    <span>{status.icon}</span>
+                  <div className="budget-status-badge" style={{ backgroundColor: status.backgroundColor, color: status.color }}>
+                    <span aria-hidden="true">{status.icon}</span>
                     <span>{status.message}</span>
                   </div>
 
@@ -351,7 +355,7 @@ export default function Budgets() {
 
               {status.status === 'expired' && (
                 <div className="budget-expired">
-                  <span className="expired-icon">⏱️</span>
+                  <span className="expired-icon" aria-hidden="true">⏱️</span>
                   <span>Period ended</span>
                 </div>
               )}
@@ -360,36 +364,48 @@ export default function Budgets() {
         })}
 
         {/* Create Budget Card */}
-        <div className="create-budget-card" onClick={() => setShowCreateModal(true)}>
+        <button 
+          className="create-budget-card" 
+          onClick={() => setShowCreateModal(true)}
+          aria-label="Create new budget"
+        >
           <div className="create-budget-content">
-            <Plus className="create-plus-icon" />
+            <Plus className="create-plus-icon" aria-hidden="true" />
             <h3>Create Budget</h3>
             <p>Set spending limits for categories</p>
           </div>
-        </div>
+        </button>
 
       </div>
 
       {/* Create Budget Modal */}
       {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+        <div 
+          className="modal-overlay" 
+          onClick={() => setShowCreateModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-budget-title"
+        >
           <div className="modal-content-large" onClick={(e) => e.stopPropagation()}>
-            <h3>Create New Budget</h3>
-            {error && <div className="error-message">{error}</div>}
+            <h3 id="create-budget-title">Create New Budget</h3>
+            {error && <div className="error-message" role="alert">{error}</div>}
             
             <div className="modal-form">
               <div className="form-group-full">
-                <label>Categories</label>
-                <div className="category-chips">
+                <label htmlFor="budget-categories">Categories</label>
+                <div className="category-chips" role="group" aria-labelledby="budget-categories">
                   {categories.map(cat => (
                     <button
                       key={cat}
                       type="button"
                       className={`category-chip ${formData.categories.includes(cat) ? 'selected' : ''}`}
                       onClick={() => toggleCategory(cat)}
+                      aria-pressed={formData.categories.includes(cat)}
+                      aria-label={`${cat} category`}
                     >
                       {formData.categories.includes(cat) && (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: '4px' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: '4px' }} aria-hidden="true">
                           <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
                       )}
@@ -400,37 +416,43 @@ export default function Budgets() {
               </div>
 
               <div className="form-group">
-                <label>Budget Limit ({settings.currency})</label>
+                <label htmlFor="budget-limit">Budget Limit ({settings.currency})</label>
                 <input 
+                  id="budget-limit"
                   type="number"
                   step="0.01"
                   placeholder="0.00"
                   value={formData.limit}
                   onChange={(e) => setFormData({...formData, limit: e.target.value})}
                   className="form-input"
+                  aria-label={`Budget limit in ${settings.currency}`}
                 />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Start Date</label>
+                  <label htmlFor="budget-start-date">Start Date</label>
                   <input 
+                    id="budget-start-date"
                     type="date" 
                     value={formData.startDate}
                     max={formData.endDate || undefined}
                     onChange={(e) => setFormData({...formData, startDate: e.target.value})}
                     className="form-input"
+                    aria-label="Budget start date"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label>End Date</label>
+                  <label htmlFor="budget-end-date">End Date</label>
                   <input 
+                    id="budget-end-date"
                     type="date" 
                     value={formData.endDate}
                     min={formData.startDate || undefined}
                     onChange={(e) => setFormData({...formData, endDate: e.target.value})}
                     className="form-input"
+                    aria-label="Budget end date"
                   />
                 </div>
               </div>
@@ -450,9 +472,15 @@ export default function Budgets() {
 
       {/* Delete Modal */}
       {deleteModal.isOpen && (
-        <div className="modal-overlay" onClick={() => setDeleteModal({ isOpen: false, budgetId: null, budgetCategories: [] })}>
+        <div 
+          className="modal-overlay" 
+          onClick={() => setDeleteModal({ isOpen: false, budgetId: null, budgetCategories: [] })}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-budget-title"
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Delete Budget</h3>
+            <h3 id="delete-budget-title">Delete Budget</h3>
             <p>Are you sure you want to delete the budget for "<strong>
               {new Intl.ListFormat("en", {style: "long", type: "conjunction"})
                 .format(deleteModal.budgetCategories)}

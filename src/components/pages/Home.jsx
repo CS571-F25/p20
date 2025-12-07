@@ -9,6 +9,13 @@ import logo from '../../assets/logo.png';
 export default function Home() {
   const navigate = useNavigate();
 
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <style>{`
@@ -20,8 +27,25 @@ export default function Home() {
           z-index: 1000 !important;
         }
 
+        /* Skip to main content link */
+        .skip-to-main {
+          position: absolute;
+          left: -9999px;
+          z-index: 999;
+          padding: 1em;
+          background-color: #4299e1;
+          color: white;
+          text-decoration: none;
+          border-radius: 0 0 4px 0;
+        }
+
+        .skip-to-main:focus {
+          left: 0;
+          top: 0;
+        }
+
         .landing-page {
-          padding-top: 80px; /* Prevent content from hiding under navbar */
+          padding-top: 80px;
           background-color: #f7fafc;
           color: #2d3748;
           line-height: 1.6;
@@ -69,7 +93,7 @@ export default function Home() {
 
         .hero-description {
           font-size: 1.25em;
-          color: #718096;
+          color: #4a5568;
           margin-bottom: 40px;
           max-width: 800px;
           margin-left: auto;
@@ -85,6 +109,17 @@ export default function Home() {
           margin-bottom: 40px;
         }
 
+        .btn-primary, .btn-secondary, .btn-cta {
+          transition: all 0.3s ease;
+        }
+
+        .btn-primary:focus-visible,
+        .btn-secondary:focus-visible,
+        .btn-cta:focus-visible {
+          outline: 3px solid #4299e1;
+          outline-offset: 3px;
+        }
+
         .btn-primary {
           background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
           color: white;
@@ -94,7 +129,6 @@ export default function Home() {
           cursor: pointer;
           font-size: 1.1em;
           font-weight: 600;
-          transition: all 0.3s ease;
           box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
         }
 
@@ -112,7 +146,6 @@ export default function Home() {
           cursor: pointer;
           font-size: 1.1em;
           font-weight: 600;
-          transition: all 0.3s ease;
         }
 
         .btn-secondary:hover {
@@ -124,7 +157,7 @@ export default function Home() {
           display: flex;
           gap: 40px;
           justify-content: center;
-          color: #718096;
+          color: #4a5568;
           font-size: 0.95em;
           flex-wrap: wrap;
         }
@@ -150,7 +183,7 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #718096;
+          color: #4a5568;
           font-weight: 600;
           font-size: 1.1em;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -176,7 +209,7 @@ export default function Home() {
 
         .section-subtitle {
           font-size: 1.2em;
-          color: #718096;
+          color: #4a5568;
         }
 
         .features-grid {
@@ -221,7 +254,7 @@ export default function Home() {
         }
 
         .feature-description {
-          color: #718096;
+          color: #4a5568;
           line-height: 1.6;
         }
 
@@ -273,7 +306,7 @@ export default function Home() {
         }
 
         .step-description {
-          color: #718096;
+          color: #4a5568;
           line-height: 1.6;
         }
 
@@ -339,7 +372,6 @@ export default function Home() {
           cursor: pointer;
           font-size: 1.2em;
           font-weight: 700;
-          transition: all 0.3s ease;
           box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
@@ -380,15 +412,8 @@ export default function Home() {
         }
 
         .footer-logo {
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
+          width: 40px;
+          height: 40px;
         }
 
         .footer-brand-text {
@@ -417,15 +442,29 @@ export default function Home() {
           padding: 0;
         }
 
-        .footer-links a {
+        .footer-links a,
+        .footer-links button {
           color: #a0aec0;
           text-decoration: none;
           font-size: 0.9em;
           transition: color 0.2s ease;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          text-align: left;
         }
 
-        .footer-links a:hover {
+        .footer-links a:hover,
+        .footer-links button:hover {
           color: #66aaff;
+        }
+
+        .footer-links a:focus-visible,
+        .footer-links button:focus-visible {
+          outline: 2px solid #66aaff;
+          outline-offset: 2px;
+          border-radius: 2px;
         }
 
         .footer-bottom {
@@ -433,6 +472,18 @@ export default function Home() {
           padding-top: 30px;
           text-align: center;
           font-size: 0.9em;
+        }
+
+        .visually-hidden {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
         }
 
         @media (max-width: 880px) {
@@ -450,12 +501,19 @@ export default function Home() {
         }
       `}</style>
 
+      {/* Skip to main content link */}
+      <a href="#main-content" className="skip-to-main">
+        Skip to main content
+      </a>
+
       <div className="landing-page">
         {/* HERO SECTION */}
-        <section className="hero-section">
+        <section className="hero-section" aria-labelledby="hero-heading">
           <div className="hero-container">
-            <div className="hero-badge">💰 Track Every Dollar, Reach Every Goal</div>
-            <h1 className="hero-title">
+            <div className="hero-badge" aria-label="Track Every Dollar, Reach Every Goal">
+              💰 Track Every Dollar, Reach Every Goal
+            </div>
+            <h1 id="hero-heading" className="hero-title">
               Your Money,<br />
               <span className="highlight">Your Control</span>
             </h1>
@@ -464,196 +522,234 @@ export default function Home() {
               and visualize your spending patterns. All in one intuitive platform.
             </p>
             <div className="hero-buttons">
-              <button className="btn-primary" onClick={()=>{
-                navigate("/signup");
-              }}
-              >Start Tracking Free →</button>
-              <button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView()}>See How It Works</button>
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate("/signup")}
+              >
+                Start Tracking Free →
+              </button>
+              <button 
+                className="btn-secondary" 
+                onClick={() => scrollToSection('features')}
+                aria-label="Scroll to features section"
+              >
+                See How It Works
+              </button>
             </div>
-            <div className="hero-stats">
-              <div className="hero-stat">✓ Free to use</div>
-              <div className="hero-stat">✓ Multi-currency</div>
-              <div className="hero-stat">✓ Real-time insights</div>
+            <div className="hero-stats" role="list" aria-label="Key features">
+              <div className="hero-stat" role="listitem">
+                <span aria-hidden="true">✓</span> Free to use
+              </div>
+              <div className="hero-stat" role="listitem">
+                <span aria-hidden="true">✓</span> Multi-currency
+              </div>
+              <div className="hero-stat" role="listitem">
+                <span aria-hidden="true">✓</span> Real-time insights
+              </div>
             </div>
 
             <div className="hero-image">
-              <div className="image-placeholder">
+              <div className="image-placeholder" aria-hidden="true">
                 📊 Dashboard Screenshot Preview
               </div>
             </div>
           </div>
         </section>
 
-        {/* FEATURES SECTION */}
-        <section id="features" className="features-section">
-          <div className="section-header">
-            <h2 className="section-title">Everything You Need to Master Your Money</h2>
-            <p className="section-subtitle">Powerful features designed to simplify your financial life</p>
-          </div>
-
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-icon">📝</div>
-              <h3 className="feature-title">Smart Transaction Tracking</h3>
-              <p className="feature-description">
-                Add and categorize transactions with ease. Track expenses and income across
-                multiple currencies with automatic date grouping and filtering.
-              </p>
+        {/* MAIN CONTENT */}
+        <main id="main-content">
+          {/* FEATURES SECTION */}
+          <section id="features" className="features-section" aria-labelledby="features-heading">
+            <div className="section-header">
+              <h2 id="features-heading" className="section-title">
+                Everything You Need to Master Your Money
+              </h2>
+              <p className="section-subtitle">Powerful features designed to simplify your financial life</p>
             </div>
 
-            <div className="feature-card">
-              <div className="feature-icon">🎯</div>
-              <h3 className="feature-title">Budget Management</h3>
-              <p className="feature-description">
-                Set spending limits by category and timeframe. Get real-time alerts on your
-                daily budget and track progress with visual indicators.
-              </p>
+            <div className="features-grid">
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">📝</div>
+                <h3 className="feature-title">Smart Transaction Tracking</h3>
+                <p className="feature-description">
+                  Add and categorize transactions with ease. Track expenses and income across
+                  multiple currencies with automatic date grouping and filtering.
+                </p>
+              </article>
+
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">🎯</div>
+                <h3 className="feature-title">Budget Management</h3>
+                <p className="feature-description">
+                  Set spending limits by category and timeframe. Get real-time alerts on your
+                  daily budget and track progress with visual indicators.
+                </p>
+              </article>
+
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">📊</div>
+                <h3 className="feature-title">Visual Analytics Dashboard</h3>
+                <p className="feature-description">
+                  View spending trends with beautiful charts and graphs. Understand your
+                  financial patterns with weekly and monthly breakdowns.
+                </p>
+              </article>
+
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">🌍</div>
+                <h3 className="feature-title">Multi-Currency Support</h3>
+                <p className="feature-description">
+                  Track transactions in 35+ currencies including USD, EUR, GBP, JPY, and more.
+                  Perfect for international travelers and expats.
+                </p>
+              </article>
+
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">📑</div>
+                <h3 className="feature-title">Category Insights</h3>
+                <p className="feature-description">
+                  Organize spending across Food, Transportation, Entertainment, Shopping, Bills,
+                  and more. See exactly where your money goes.
+                </p>
+              </article>
+
+              <article className="feature-card">
+                <div className="feature-icon" aria-hidden="true">📅</div>
+                <h3 className="feature-title">Flexible Date Filtering</h3>
+                <p className="feature-description">
+                  Filter transactions by custom date ranges, view this week's spending, or
+                  analyze historical data with powerful search and export features.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          {/* HOW IT WORKS */}
+          <section id="how-it-works" className="how-it-works-section" aria-labelledby="how-it-works-heading">
+            <div className="section-header">
+              <h2 id="how-it-works-heading" className="section-title">Simple, Smart, Effective</h2>
+              <p className="section-subtitle">Get started in three easy steps</p>
             </div>
 
-            <div className="feature-card">
-              <div className="feature-icon">📊</div>
-              <h3 className="feature-title">Visual Analytics Dashboard</h3>
-              <p className="feature-description">
-                View spending trends with beautiful charts and graphs. Understand your
-                financial patterns with weekly and monthly breakdowns.
-              </p>
+            <div className="steps-container">
+              <article className="step-card">
+                <div className="step-number" aria-label="Step 1">1</div>
+                <h3 className="step-title">Add Transactions</h3>
+                <p className="step-description">
+                  Quickly log your expenses and income with detailed descriptions, categories,
+                  and amounts in any currency.
+                </p>
+              </article>
+
+              <article className="step-card">
+                <div className="step-number" aria-label="Step 2">2</div>
+                <h3 className="step-title">Create Budgets</h3>
+                <p className="step-description">
+                  Set spending limits for one or multiple categories with custom start and end
+                  dates to stay on track.
+                </p>
+              </article>
+
+              <article className="step-card">
+                <div className="step-number" aria-label="Step 3">3</div>
+                <h3 className="step-title">Track & Analyze</h3>
+                <p className="step-description">
+                  View your dashboard to see spending trends, budget progress, and get daily
+                  spending recommendations to meet your goals.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          {/* SCREENSHOTS SECTION */}
+          <section id="screenshots" className="screenshot-section" aria-labelledby="screenshots-heading">
+            <div className="section-header">
+              <h2 id="screenshots-heading" className="section-title">See WalletPalz in Action</h2>
+              <p className="section-subtitle">Beautiful, intuitive interface designed for daily use</p>
             </div>
 
-            <div className="feature-card">
-              <div className="feature-icon">🌍</div>
-              <h3 className="feature-title">Multi-Currency Support</h3>
-              <p className="feature-description">
-                Track transactions in 35+ currencies including USD, EUR, GBP, JPY, and more.
-                Perfect for international travelers and expats.
-              </p>
-            </div>
+            <div className="screenshot-grid">
+              <article className="screenshot-card">
+                <h3 className="screenshot-title">
+                  <span aria-hidden="true">📝</span> Transaction Tracking
+                </h3>
+                <img 
+                  src={trackTransactionsImg} 
+                  alt="Transaction tracking interface showing a list of expenses with categories, amounts, and dates"
+                  style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                />
+              </article>
 
-            <div className="feature-card">
-              <div className="feature-icon">📑</div>
-              <h3 className="feature-title">Category Insights</h3>
-              <p className="feature-description">
-                Organize spending across Food, Transportation, Entertainment, Shopping, Bills,
-                and more. See exactly where your money goes.
-              </p>
-            </div>
-
-            <div className="feature-card">
-              <div className="feature-icon">📅</div>
-              <h3 className="feature-title">Flexible Date Filtering</h3>
-              <p className="feature-description">
-                Filter transactions by custom date ranges, view this week's spending, or
-                analyze historical data with powerful search and export features.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* HOW IT WORKS */}
-        <section id="how-it-works" className="how-it-works-section">
-          <div className="section-header">
-            <h2 className="section-title">Simple, Smart, Effective</h2>
-            <p className="section-subtitle">Get started in three easy steps</p>
-          </div>
-
-          <div className="steps-container">
-            <div className="step-card">
-              <div className="step-number">1</div>
-              <h3 className="step-title">Add Transactions</h3>
-              <p className="step-description">
-                Quickly log your expenses and income with detailed descriptions, categories,
-                and amounts in any currency.
-              </p>
-            </div>
-
-            <div className="step-card">
-              <div className="step-number">2</div>
-              <h3 className="step-title">Create Budgets</h3>
-              <p className="step-description">
-                Set spending limits for one or multiple categories with custom start and end
-                dates to stay on track.
-              </p>
-            </div>
-
-            <div className="step-card">
-              <div className="step-number">3</div>
-              <h3 className="step-title">Track & Analyze</h3>
-              <p className="step-description">
-                View your dashboard to see spending trends, budget progress, and get daily
-                spending recommendations to meet your goals.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* SCREENSHOTS SECTION */}
-        <section id="screenshots" className="screenshot-section">
-          <div className="section-header">
-            <h2 className="section-title">See WalletPalz in Action</h2>
-            <p className="section-subtitle">Beautiful, intuitive interface designed for daily use</p>
-          </div>
-
-          <div className="screenshot-grid">
-            <div className="screenshot-card">
-              <h3 className="screenshot-title">📝 Transaction Tracking</h3>
-              <img 
-                src={trackTransactionsImg} 
-                alt="Transaction tracking interface"
-                style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-              />
-            </div>
-
-            <div className="screenshot-card">
-              <h3 className="screenshot-title">🎯 Budgeting</h3>
-              <img 
+              <article className="screenshot-card">
+                <h3 className="screenshot-title">
+                  <span aria-hidden="true">🎯</span> Budgeting
+                </h3>
+                <img 
                   src={budgetImg} 
-                  alt="Budget tracking interface"
+                  alt="Budget tracking interface displaying spending limits and progress bars for different categories"
                   style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                 />
-            </div>
-          </div>
-
-          <div className="screenshot-grid">
-            <div className="screenshot-card">
-              <h3 className="screenshot-title">📊 Analytics Charts</h3>
-              <div className="image-placeholder">
-                Spending Trends Graph<br />
-                <small style={{ opacity: 0.7 }}>Weekly and monthly spending breakdowns</small>
-              </div>
+              </article>
             </div>
 
-            <div className="screenshot-card">
-              <h3 className="screenshot-title">🔔 Get Notified!</h3>
-              <img 
+            <div className="screenshot-grid">
+              <article className="screenshot-card">
+                <h3 className="screenshot-title">
+                  <span aria-hidden="true">📊</span> Analytics Charts
+                </h3>
+                <div className="image-placeholder" aria-label="Placeholder for spending trends graph showing weekly and monthly spending breakdowns">
+                  <span aria-hidden="true">
+                    Spending Trends Graph<br />
+                    <small style={{ opacity: 0.7 }}>Weekly and monthly spending breakdowns</small>
+                  </span>
+                </div>
+              </article>
+
+              <article className="screenshot-card">
+                <h3 className="screenshot-title">
+                  <span aria-hidden="true">🔔</span> Get Notified!
+                </h3>
+                <img 
                   src={notiImg} 
-                  alt="Notification dropdown interface"
+                  alt="Notification dropdown interface showing budget alerts and spending updates"
                   style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                 />
+              </article>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* CTA SECTION */}
-        <section className="cta-section">
-          <div className="cta-container">
-            <h2 className="cta-title">Ready to Take Control?</h2>
-            <p className="cta-description">
-              Join us now and manage your finances better with WalletPalz.
-              Start tracking today. Completely free!
-            </p>
-            <button className="btn-cta" onClick={()=>{
-              navigate("/signup");
-            }}>Get Started Now</button>
-            <p className="cta-note">No credit card required • Free forever</p>
-          </div>
-        </section>
+          {/* CTA SECTION */}
+          <section className="cta-section" aria-labelledby="cta-heading">
+            <div className="cta-container">
+              <h2 id="cta-heading" className="cta-title">Ready to Take Control?</h2>
+              <p className="cta-description">
+                Join us now and manage your finances better with WalletPalz.
+                Start tracking today. Completely free!
+              </p>
+              <button 
+                className="btn-cta" 
+                onClick={() => navigate("/signup")}
+              >
+                Get Started Now
+              </button>
+              <p className="cta-note">No credit card required • Free forever</p>
+            </div>
+          </section>
+        </main>
 
         {/* FOOTER */}
-        <footer className="footer">
+        <footer className="footer" role="contentinfo">
           <div className="footer-container">
             <div className="footer-grid">
               <div>
                 <div className="footer-brand">
-                  <img src={logo} alt="Logo" className="nav-logo" />
+                  <img 
+                    src={logo} 
+                    alt="WalletPalz logo" 
+                    className="footer-logo"
+                    width="40"
+                    height="40"
+                  />
                   <span className="footer-brand-text">WalletPalz</span>
                 </div>
                 <p className="footer-description">
@@ -661,33 +757,52 @@ export default function Home() {
                 </p>
               </div>
 
-              <div>
-                <h4 className="footer-title" id="feature">Features</h4>
+              <nav aria-labelledby="footer-features-heading">
+                <h3 id="footer-features-heading" className="footer-title">Features</h3>
                 <ul className="footer-links">
-                  <li><a href="#features">Transaction Tracking</a></li>
-                  <li><a href="#features">Budget Management</a></li>
-                  <li><a href="#features">Analytics Dashboard</a></li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('features')}
+                      aria-label="Navigate to transaction tracking section"
+                    >
+                      Transaction Tracking
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('features')}
+                      aria-label="Navigate to budget management section"
+                    >
+                      Budget Management
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('features')}
+                      aria-label="Navigate to analytics dashboard section"
+                    >
+                      Analytics Dashboard
+                    </button>
+                  </li>
                 </ul>
-              </div>
+              </nav>
 
-              <div>
-                <h4 className="footer-title">Company</h4>
+              <nav aria-labelledby="footer-company-heading">
+                <h3 id="footer-company-heading" className="footer-title">Company</h3>
                 <ul className="footer-links">
-                  <li><a href="#">About Us</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
+                  <li><span className="visually-hidden">Coming soon: </span>About Us</li>
+                  <li><span className="visually-hidden">Coming soon: </span>Privacy Policy</li>
                 </ul>
-              </div>
+              </nav>
 
-              <div>
-                <h4 className="footer-title">Support</h4>
+              <nav aria-labelledby="footer-support-heading">
+                <h3 id="footer-support-heading" className="footer-title">Support</h3>
                 <ul className="footer-links">
-                  <li><a href="#">Contact Us</a></li>
-                  <li><a href="#">Send Us Feedback</a></li>
+                  <li><span className="visually-hidden">Coming soon: </span>Contact Us</li>
+                  <li><span className="visually-hidden">Coming soon: </span>Send Us Feedback</li>
                 </ul>
-              </div>
+              </nav>
             </div>
-
-
           </div>
         </footer>
       </div>

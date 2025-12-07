@@ -537,6 +537,7 @@ export default function Transactions() {
               {/* Type and Date in a row */}
               <div className="form-row">
                 <select 
+                  aria-label="Transaction type"
                   value={formData.type} 
                   onChange={(e) => setFormData({...formData, type: e.target.value})}
                 >
@@ -544,11 +545,14 @@ export default function Transactions() {
                   <option value="income">Income</option>
                 </select>
 
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, date: e.target.value })
+                  }
                   className="modern-date-input"
+                  aria-label="Transaction date"
                 />
               </div>
 
@@ -557,17 +561,24 @@ export default function Transactions() {
                 placeholder="Description"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
+                aria-label="Transaction description"
               />
 
-              <select 
+              <select
+                aria-label="Category"
                 value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
               >
                 <option value="">Select category</option>
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
+
 
               {/* Amount and Currency in a row */}
               <div className="form-row">
@@ -577,9 +588,11 @@ export default function Transactions() {
                   placeholder="Amount"
                   value={formData.amount}
                   onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                  aria-label="Amount"
                 />
 
-                <select 
+                <select
+                  aria-label="Currency"
                   value={formData.currency}
                   onChange={(e) => setFormData({...formData, currency: e.target.value})}
                   style={{ flex: '0 0 100px' }}
@@ -608,7 +621,11 @@ export default function Transactions() {
               {/* Category Filter */}
               <ClickOutsideWrapper onClickOutside={() => setShowCategoryFilter(false)}>
                 <div style={{ position: 'relative' }}>
-                  <button onClick={handleFilterByCategory} className="btn-filter">
+                  <button onClick={handleFilterByCategory} 
+                    className="btn-filter"
+                    aria-haspopup="true"
+                    aria-expanded={showCategoryFilter ? "true" : "false"}
+                    aria-label="Filter by category">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
@@ -738,6 +755,7 @@ export default function Transactions() {
                       <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '6px', fontWeight: '600' }}>Custom Range</label>
                       <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>Start Date</label>
                       <input 
+                        aria-label='Select date start'
                         type="date" 
                         value={tempDateRange.start}
                         max={tempDateRange.end || undefined}
@@ -746,6 +764,7 @@ export default function Transactions() {
                       />
                       <label style={{ fontSize: '12px', color: '#64748b', display: 'block', marginBottom: '4px' }}>End Date</label>
                       <input 
+                        aria-label='Select date end'
                         type="date" 
                         value={tempDateRange.end}
                         min={tempDateRange.start || undefined}
@@ -839,6 +858,7 @@ export default function Transactions() {
                 type="text"
                 className="search-input"
                 placeholder="Search transactions..."
+                aria-label='Search transactions'
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -930,7 +950,7 @@ export default function Transactions() {
                         <span style={{
                           fontSize: '14px', 
                           fontWeight: '600', 
-                          color: (weekLabel.includes('This Week') || weekLabel.includes('Last Week')) ? '#3d7bdfff' : '#576475ff', // Blue for recent weeks
+                          color: (weekLabel.includes('This Week') || weekLabel.includes('Last Week')) ? '#1e40af' : '#1a202c',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px'
                         }}>
@@ -946,6 +966,7 @@ export default function Transactions() {
                             {editingId === transaction.id ? (
                               <div className="edit-form">
                                 <input 
+                                  aria-label='Description'
                                   type="text" 
                                   value={editFormData.description}
                                   onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
@@ -953,7 +974,8 @@ export default function Transactions() {
                                   placeholder="Description"
                                 />
                                 <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-                                  <select 
+                                  <select
+                                    aria-label='Select Category'
                                     value={editFormData.category}
                                     onChange={(e) => setEditFormData({...editFormData, category: e.target.value})}
                                     className="edit-select"
@@ -964,6 +986,7 @@ export default function Transactions() {
                                     ))}
                                   </select>
                                   <input 
+                                    aria-label='Select date'
                                     type="date" 
                                     value={editFormData.date}
                                     onChange={(e) => setEditFormData({...editFormData, date: e.target.value})}
@@ -985,6 +1008,7 @@ export default function Transactions() {
                             {editingId === transaction.id ? (
                               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <select 
+                                  aria-label='Select transaction type'
                                   value={editFormData.type}
                                   onChange={(e) => setEditFormData({...editFormData, type: e.target.value})}
                                   className="edit-select-small"
@@ -993,6 +1017,7 @@ export default function Transactions() {
                                   <option value="income">Income</option>
                                 </select>
                                 <input 
+                                  aria-label='Input transaction amount'
                                   type="number" 
                                   step="1"
                                   value={editFormData.amount}
@@ -1001,6 +1026,7 @@ export default function Transactions() {
                                   style={{ width: '100px' }}
                                 />
                                 <select 
+                                  aria-label='Select transaction currency'
                                   value={editFormData.currency}
                                   onChange={(e) => setEditFormData({...editFormData, currency: e.target.value})}
                                   className="edit-select-small" 
@@ -1017,21 +1043,45 @@ export default function Transactions() {
                               </span>
                             )}
                             
-                            <button 
-                              onClick={() => editingId === transaction.id ? handleSaveEdit(transaction.id) : handleEdit(transaction.id)}
+                            <button
+                              onClick={() =>
+                                editingId === transaction.id
+                                  ? handleSaveEdit(transaction.id)
+                                  : handleEdit(transaction.id)
+                              }
                               className="btn-edit"
+                              aria-label={
+                                editingId === transaction.id ? "Save transaction" : "Edit transaction"
+                              }
                             >
                               {editingId === transaction.id ? (
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  aria-hidden="true"
+                                >
                                   <polyline points="20 6 9 17 4 12"></polyline>
                                 </svg>
                               ) : (
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  aria-hidden="true"
+                                >
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                               )}
                             </button>
+
                             
                             {editingId === transaction.id && (
                               <button onClick={handleCancelEdit} className="btn-cancel-edit">
@@ -1043,14 +1093,31 @@ export default function Transactions() {
                             )}
                             
                             {editingId !== transaction.id && (
-                              <button className="btn-delete" onClick={() => openDeleteModal(transaction.id, transaction.description)}>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <button
+                                className="btn-delete"
+                                onClick={() =>
+                                  openDeleteModal(transaction.id, transaction.description)
+                                }
+                                aria-label="Delete transaction"
+                              >
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  aria-hidden="true"
+                                >
                                   <path d="M3 6h18"></path>
                                   <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                                   <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                                 </svg>
                               </button>
                             )}
+
                           </div>
                         </div>
                       ))}
@@ -1067,6 +1134,7 @@ export default function Transactions() {
                 {totalPages > 1 && (
                   <div className="pagination">
                     <button 
+                      aria-label='previous page button'
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className="pagination-btn"
@@ -1079,6 +1147,7 @@ export default function Transactions() {
                     <div className="page-numbers">
                       {[...Array(totalPages)].map((_, index) => (
                         <button
+                          aria-label={`Page ${index + 1} button`}
                           key={index + 1}
                           onClick={() => setCurrentPage(index + 1)}
                           className={`page-number ${currentPage === index + 1 ? 'active' : ''}`}
@@ -1089,6 +1158,7 @@ export default function Transactions() {
                     </div>
                     
                     <button 
+                      aria-label='next page button'
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       disabled={currentPage === totalPages}
                       className="pagination-btn"
@@ -1117,7 +1187,7 @@ export default function Transactions() {
             <p>Are you sure you want to delete "<strong>{deleteModal.transactionDescription}</strong>"?</p>
             <p className="modal-warning">This action cannot be undone.</p>
             <div className="modal-actions">
-              <button className="btn-cancel" onClick={closeDeleteModal}>
+              <button className="btn-cancel" onClick={closeDeleteModal} autoFocus>
                 Cancel
               </button>
               <button className="btn-confirm-delete" onClick={handleDelete}>
@@ -1155,6 +1225,7 @@ export default function Transactions() {
             </p>
             <div className="modal-actions">
               <button 
+                autoFocus
                 className="btn-error-ok" 
                 onClick={() => setErrorModal({ isOpen: false, message: '' })}
                 style={{

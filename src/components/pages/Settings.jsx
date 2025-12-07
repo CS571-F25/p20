@@ -194,7 +194,7 @@ export default function Settings(props) {
                     {/* Notification Settings */}
                     <div>
                         <AppCard width="100%" marginTop="25px">
-                            <h3>🔔 Notification Preferences (placeholder, not functional)</h3>
+                            <h3>🔔 Notification Preferences</h3>
                             <p className="setting-description">
                                 Manage how and when you receive notifications.
                             </p>

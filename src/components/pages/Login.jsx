@@ -36,7 +36,6 @@ export default function Login() {
                 setError(error.message);
             } else {
                 // Successfully logged in
-                // sessionStorage.setItem("email", email);  
                 navigate("/dashboard");
             }
         } catch (err) {
@@ -51,28 +50,65 @@ export default function Login() {
             <AppCard width="450px">
                 {/* Logo at the top */}
                 <div className="text-center mb-3">
-                    <Image src={logo} alt="Logo" height={120} width={120} />
+                    <Image 
+                        src={logo} 
+                        alt="Budget tracking application logo" 
+                        height={120} 
+                        width={120} 
+                    />
                 </div>
 
-                <h3 className="text-center mb-4">Login</h3>
+                <h1 className="text-center mb-4" style={{ fontSize: '1.75rem' }}>Login</h1>
                 
                 {/* Display error message */}
-                {error && <div className="alert alert-danger">{error}</div>}
+                {error && (
+                    <div 
+                        className="alert alert-danger" 
+                        role="alert"
+                        aria-live="assertive"
+                    >
+                        {error}
+                    </div>
+                )}
 
-                <Form onSubmit={handleLogin}>
+                <Form onSubmit={handleLogin} noValidate>
                     {/* Email and password fields */}
                     <Form.Group className="mb-3">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" ref={emailRef} />
+                        <Form.Label htmlFor="login-email">Email</Form.Label>
+                        <Form.Control 
+                            id="login-email"
+                            type="email" 
+                            ref={emailRef}
+                            autoComplete="email"
+                            required
+                            aria-required="true"
+                            aria-describedby={error ? "login-error" : undefined}
+                        />
                     </Form.Group>
+                    
                     <Form.Group className="mb-3">
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type="password" ref={passwordRef} />
+                        <Form.Label htmlFor="login-password">Password</Form.Label>
+                        <Form.Control 
+                            id="login-password"
+                            type="password" 
+                            ref={passwordRef}
+                            autoComplete="current-password"
+                            required
+                            aria-required="true"
+                            aria-describedby={error ? "login-error" : undefined}
+                        />
                     </Form.Group>
+
+                    {/* Hidden error ID for aria-describedby */}
+                    {error && <div id="login-error" className="visually-hidden">{error}</div>}
 
                     {/* log in submit button */}
                     <div className="d-grid mb-2">
-                        <Button type="submit" disabled={loading}>
+                        <Button 
+                            type="submit" 
+                            disabled={loading}
+                            aria-busy={loading}
+                        >
                             {loading ? 'Logging in...' : 'Log In'}
                         </Button>
                     </div>
