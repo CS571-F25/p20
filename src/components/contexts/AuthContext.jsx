@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/p20/#/auth-success`
+        emailRedirectTo: `${window.location.origin}/p20/`
       }
     });
     return { data, error };

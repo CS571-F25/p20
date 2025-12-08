@@ -1,60 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { supabase } from '../../supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthSuccess() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState("processing");
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
-      // Extract tokens from the hash
-      const hashString = window.location.hash;
-      
-      // Check if there's an access_token in the hash
-      if (hashString.includes('access_token=')) {
-        // Extract everything after the second #
-        const tokenPart = hashString.split('#').find(part => part.includes('access_token='));
+    if (!loading) {
+      if (user) {
+        // User is authenticated, redirect to dashboard after 2 seconds
+        const timer = setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
         
-        if (tokenPart) {
-          // Parse the token parameters
-          const params = new URLSearchParams(tokenPart);
-          const accessToken = params.get('access_token');
-          const refreshToken = params.get('refresh_token');
-          
-          if (accessToken && refreshToken) {
-            // Set the session using the tokens
-            const { data, error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken
-            });
-            
-            if (error) {
-              console.error("Auth error:", error);
-              setStatus("error");
-              setTimeout(() => navigate("/login"), 3000);
-              return;
-            }
-            
-            if (data.session) {
-              console.log("User authenticated:", data.session.user);
-              setStatus("success");
-              
-              // Clean up the URL and redirect
-              window.location.hash = '/dashboard'; // This will navigate and clean URL
-              return;
-            }
-          }
-        }
+        return () => clearTimeout(timer);
+      } else {
+        // No user found, redirect to login
+        navigate("/login");
       }
-      
-      // If we get here, something went wrong
-      setStatus("error");
-      setTimeout(() => navigate("/login"), 3000);
-    };
-
-    handleAuthCallback();
-  }, [navigate]);
+    }
+  }, [user, loading, navigate]);
 
   return (
     <div
@@ -67,22 +33,15 @@ export default function AuthSuccess() {
         fontFamily: "sans-serif",
       }}
     >
-      {status === "processing" && (
+      {user ? (
+        <>
+          <h1>Registration Successful 🎉</h1>
+          <p>Welcome {user.email}! Redirecting to dashboard...</p>
+        </>
+      ) : (
         <>
           <h1>Confirming your email...</h1>
           <p>Please wait...</p>
-        </>
-      )}
-      {status === "success" && (
-        <>
-          <h1>Registration Successful 🎉</h1>
-          <p>You will be redirected shortly...</p>
-        </>
-      )}
-      {status === "error" && (
-        <>
-          <h1>Something went wrong</h1>
-          <p>Redirecting to login...</p>
         </>
       )}
     </div>
