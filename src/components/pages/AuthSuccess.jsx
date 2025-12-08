@@ -1,35 +1,56 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { supabase } from '../../supabaseClient'; // adjust path
+import { supabase } from '../../supabaseClient';
 
 export default function AuthSuccess() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState("processing"); // processing, success, error
+  const [status, setStatus] = useState("processing");
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Supabase client automatically handles the hash fragment tokens
-      const { data, error } = await supabase.auth.getSession();
+      // Extract tokens from the hash
+      const hashString = window.location.hash;
       
-      if (error) {
-        console.error("Auth error:", error);
-        setStatus("error");
-        setTimeout(() => navigate("/login"), 3000);
-        return;
-      }
-
-      if (data.session) {
-        console.log("User authenticated:", data.session.user);
-        setStatus("success");
+      // Check if there's an access_token in the hash
+      if (hashString.includes('access_token=')) {
+        // Extract everything after the second #
+        const tokenPart = hashString.split('#').find(part => part.includes('access_token='));
         
-        // Redirect to your main app (or login to let them sign in)
-        setTimeout(() => {
-          navigate("/dashboard"); // or "/dashboard" or wherever you want
-        }, 3000);
-      } else {
-        setStatus("error");
-        setTimeout(() => navigate("/login"), 3000);
+        if (tokenPart) {
+          // Parse the token parameters
+          const params = new URLSearchParams(tokenPart);
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          
+          if (accessToken && refreshToken) {
+            // Set the session using the tokens
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken
+            });
+            
+            if (error) {
+              console.error("Auth error:", error);
+              setStatus("error");
+              setTimeout(() => navigate("/login"), 3000);
+              return;
+            }
+            
+            if (data.session) {
+              console.log("User authenticated:", data.session.user);
+              setStatus("success");
+              
+              // Clean up the URL and redirect
+              window.location.hash = '/dashboard'; // This will navigate and clean URL
+              return;
+            }
+          }
+        }
       }
+      
+      // If we get here, something went wrong
+      setStatus("error");
+      setTimeout(() => navigate("/login"), 3000);
     };
 
     handleAuthCallback();
