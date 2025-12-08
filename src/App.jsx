@@ -15,7 +15,7 @@ import Profile from './components/pages/Profile';
 import Settings from './components/pages/Settings';
 import Login from './components/pages/Login';
 import Signup from './components/pages/Signup'
-
+import AuthSuccess from './components/pages/AuthSuccess'
 import NoMatch from './components/pages/NoMatch'
 
 function AppRoutes() {
@@ -43,6 +43,7 @@ function AppRoutes() {
       <Route path="/settings" element={<Settings />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup />} />
+      <Route path="/auth/success" element={<AuthSuccess />} />
       <Route path="*" element={<NoMatch />} />
     </Routes>
   );
