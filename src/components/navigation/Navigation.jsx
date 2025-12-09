@@ -86,14 +86,14 @@ function Navigation() {
                     >
                       Settings
                     </div>
-                    {/* <div 
+                    <div 
                       role="menuitem"
                       tabIndex={0}
                       onClick={() => { navigate('/about'); setMenuOpen(false); }}
                       onKeyDown={(e) => handleKeyDown(e, () => { navigate('/about'); setMenuOpen(false); })}
                     >
                       About Us
-                    </div> */}
+                    </div>
                     <div 
                       role="menuitem"
                       tabIndex={0}

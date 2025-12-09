@@ -3,8 +3,6 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Tooltip,
@@ -217,64 +215,72 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-page">
+    <main className="dashboard-page" aria-labelledby="dashboard-title">
       <div className="dashboard-header">
         <div>
-          <p className="eyebrow">Overview • Base currency {settings.currency}</p>
-          <h1>Dashboard</h1>
+          <p className="eyebrow">Overview / Base currency {settings.currency}</p>
+          <h1 id="dashboard-title">Dashboard</h1>
           <p className="muted">A quick look at your money, budgets, and recent activity.</p>
         </div>
-        <button className="refresh-btn" onClick={loadDashboardData}>
+        <button className="refresh-btn" onClick={loadDashboardData} aria-label="Refresh dashboard data">
           Refresh
         </button>
       </div>
 
       {error && <div className="error-banner">{error}</div>}
 
-      <div className="metric-grid">
-        <div className="metric-card primary">
-          <span className="label">Balance</span>
-          <h2>{formatAmount(totals.balance)}</h2>
-          <p className="muted">
-            Income {formatAmount(totals.income)} • Expenses {formatAmount(totals.expense)}
-          </p>
+      <section aria-labelledby="key-metrics-title" className="section-block">
+        <div className="section-header">
+          <h2 id="key-metrics-title" className="section-title">
+            Key metrics
+          </h2>
+          <p className="muted">Shown in {settings.currency}</p>
         </div>
-        <div className="metric-card">
-          <span className="label">Income (30d)</span>
-          <h3>
-            {formatAmount(
-              transactions
-                .filter((t) => t.type === "income")
-                .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-                .reduce((sum, t) => sum + toBaseAmount(t), 0)
-            )}
-          </h3>
-          <p className="muted">Last 30 days</p>
+        <div className="metric-grid">
+          <div className="metric-card primary">
+            <span className="label">Balance</span>
+            <p className="metric-value">{formatAmount(totals.balance)}</p>
+            <p className="muted">
+              Income {formatAmount(totals.income)} | Expenses {formatAmount(totals.expense)}
+            </p>
+          </div>
+          <div className="metric-card">
+            <span className="label">Income (30d)</span>
+            <p className="metric-value">
+              {formatAmount(
+                transactions
+                  .filter((t) => t.type === "income")
+                  .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+                  .reduce((sum, t) => sum + toBaseAmount(t), 0)
+              )}
+            </p>
+            <p className="muted">Last 30 days</p>
+          </div>
+          <div className="metric-card">
+            <span className="label">Expenses (30d)</span>
+            <p className="metric-value">
+              {formatAmount(
+                transactions
+                  .filter((t) => t.type === "expense")
+                  .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
+                  .reduce((sum, t) => sum + toBaseAmount(t), 0)
+              )}
+            </p>
+            <p className="muted">Last 30 days</p>
+          </div>
+          <div className="metric-card">
+            <span className="label">Active Budgets</span>
+            <p className="metric-value">{budgetProgress.filter((b) => b.daysLeft >= 0).length}</p>
+            <p className="muted">{budgets.length} total budgets</p>
+          </div>
         </div>
-        <div className="metric-card">
-          <span className="label">Expenses (30d)</span>
-          <h3>
-            {formatAmount(
-              transactions
-                .filter((t) => t.type === "expense")
-                .filter((t) => new Date(`${t.date}T00:00:00`) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-                .reduce((sum, t) => sum + toBaseAmount(t), 0)
-            )}
-          </h3>
-          <p className="muted">Last 30 days</p>
-        </div>
-        <div className="metric-card">
-          <span className="label">Active Budgets</span>
-          <h3>{budgetProgress.filter((b) => b.daysLeft >= 0).length}</h3>
-          <p className="muted">{budgets.length} total budgets</p>
-        </div>
-      </div>
+      </section>
 
-      <div className="chart-row">
-        <div className="chart-card">
+      <section className="chart-row" aria-label="Financial insights - trends and categories">
+        <article className="chart-card span-2" aria-labelledby="monthly-trend-title">
           <div className="card-header">
             <div>
-              <h3>Monthly Trend</h3>
+              <h2 id="monthly-trend-title">Monthly Trend</h2>
               <p className="muted">Income vs. expenses (last 6 months)</p>
             </div>
           </div>
@@ -291,12 +297,12 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </article>
 
-        <div className="chart-card">
+        <article className="chart-card span-2" aria-labelledby="category-breakdown-title">
           <div className="card-header">
             <div>
-              <h3>Spending by Category</h3>
+              <h2 id="category-breakdown-title">Spending by Category</h2>
               <p className="muted">Top categories (expenses)</p>
             </div>
           </div>
@@ -311,7 +317,6 @@ export default function Dashboard() {
                     outerRadius={90}
                     labelLine={false}
                     label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                      // place labels inside to avoid clipping
                       const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
                       const x = cx + radius * Math.cos(-midAngle * RADIAN);
                       const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -354,14 +359,14 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
 
-      <div className="chart-row">
-        <div className="chart-card wide">
+      <section className="chart-row" aria-label="Financial insights - budgets and activity">
+        <article className="chart-card span-2" aria-labelledby="budget-health-title">
           <div className="card-header">
             <div>
-              <h3>Budget Health</h3>
+              <h2 id="budget-health-title">Budget Health</h2>
               <p className="muted">Spending against your limits</p>
             </div>
           </div>
@@ -383,7 +388,7 @@ export default function Dashboard() {
                       <span className="muted">of {formatAmount(budget.limit || 0)}</span>
                     </div>
                   </div>
-                  <div className="progress">
+                  <div className="progress" role="presentation" aria-hidden="true">
                     <div
                       className={`progress-fill ${budget.percent > 90 ? "danger" : budget.percent > 70 ? "warn" : "ok"}`}
                       style={{ width: `${budget.percent}%` }}
@@ -402,12 +407,12 @@ export default function Dashboard() {
               ))}
             </div>
           )}
-        </div>
+        </article>
 
-        <div className="chart-card narrow">
+        <article className="chart-card span-2" aria-labelledby="recent-transactions-title">
           <div className="card-header">
             <div>
-              <h3>Recent Transactions</h3>
+              <h2 id="recent-transactions-title">Recent Transactions</h2>
               <p className="muted">Latest activity</p>
             </div>
           </div>
@@ -420,7 +425,7 @@ export default function Dashboard() {
                   <div>
                     <p className="label">{t.description}</p>
                     <p className="muted">
-                      {t.category || "Uncategorized"} • {t.displayDate}
+                      {t.category || "Uncategorized"} | {t.displayDate}
                     </p>
                   </div>
                   <span className={t.type === "income" ? "income" : "expense"}>
@@ -431,8 +436,8 @@ export default function Dashboard() {
               ))}
             </div>
           )}
-        </div>
-      </div>
-    </div>
+        </article>
+      </section>
+    </main>
   );
 }

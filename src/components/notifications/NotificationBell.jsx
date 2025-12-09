@@ -124,15 +124,17 @@ function NotificationBell() {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'budget_exceeded':
-        return '🚨';
+        return '!';
       case 'budget_warning':
-        return '⚠️';
+        return '⚠';
       case 'savings_goal_achieved':
-        return '🎉';
+        return '*';
       case 'budget_milestone':
-        return '🎯';
+        return 'M';
+      case 'transaction_alert':
+        return '$';
       default:
-        return '🔔';
+        return '•';
     }
   };
 
@@ -146,6 +148,8 @@ function NotificationBell() {
         return 'Celebration';
       case 'budget_milestone':
         return 'Milestone';
+      case 'transaction_alert':
+        return 'Transaction';
       default:
         return 'Notification';
     }
@@ -232,7 +236,7 @@ function NotificationBell() {
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="notification-empty" role="status">
-                  <span style={{ fontSize: '2rem' }} aria-hidden="true">🔔</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 700 }} aria-hidden="true">No alerts</span>
                   <p>No notifications yet</p>
                 </div>
               ) : (

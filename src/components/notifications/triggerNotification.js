@@ -1,12 +1,17 @@
 import { supabase } from '../../supabaseClient';
 
 /**
- * Check budgets and create notifications if thresholds are exceeded
- * Call this after adding or editing a transaction
+ * Check budgets and create notifications if thresholds are exceeded.
+ * Respects notification preferences when provided.
  */
-export const triggerNotification = async (userId, transactions, baseCurrency) => {
+export const triggerNotification = async (userId, transactions, baseCurrency, preferences = {}) => {
   try {
-    console.log('📊 Checking budgets for user:', userId);
+    console.log('dY"S Checking budgets for user:', userId);
+
+    if (preferences.budgetAlerts === false) {
+      console.log('Budget alerts disabled in settings, skipping budget notifications.');
+      return;
+    }
     
     // Fetch all active budgets for the user
     const { data: budgets, error: budgetsError } = await supabase
@@ -17,11 +22,11 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
     if (budgetsError) throw budgetsError;
     
     if (!budgets || budgets.length === 0) {
-      console.log('ℹ️ No budgets found for user');
+      console.log('Г,1Л,? No budgets found for user');
       return;
     }
     
-    console.log(`📋 Found ${budgets.length} budget(s) to check`);
+    console.log(`dY"< Found ${budgets.length} budget(s) to check`);
     
     // Check each budget
     for (const budget of budgets) {
@@ -64,7 +69,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
         const existing = await checkExistingNotification('budget_exceeded');
         
         if (!existing) {
-          console.log('🚨 Creating BUDGET EXCEEDED notification');
+          console.log('dYs" Creating BUDGET EXCEEDED notification');
           await supabase.from('notifications').insert({
             user_id: userId,
             title: 'Budget Exceeded!',
@@ -79,7 +84,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
             }
           });
         } else {
-          console.log('ℹ️ Budget exceeded notification already exists');
+          console.log('Г,1Л,? Budget exceeded notification already exists');
         }
       }
       // Budget warning (80%+)
@@ -87,7 +92,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
         const existing = await checkExistingNotification('budget_warning');
         
         if (!existing) {
-          console.log('⚠️ Creating BUDGET WARNING notification');
+          console.log('Гs Л,? Creating BUDGET WARNING notification');
           await supabase.from('notifications').insert({
             user_id: userId,
             title: 'Budget Warning',
@@ -102,7 +107,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
             }
           });
         } else {
-          console.log('ℹ️ Budget warning notification already exists');
+          console.log('Г,1Л,? Budget warning notification already exists');
         }
       }
       // Budget milestone (50% or 75%)
@@ -110,7 +115,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
         const milestoneType = percentSpent >= 75 ? '75' : '50';
         
         // Check if milestone notification exists
-        const { data: existing, error } = await supabase
+        const { data: existing } = await supabase
           .from('notifications')
           .select('*')
           .eq('user_id', userId)
@@ -120,7 +125,7 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
           .maybeSingle();
         
         if (!existing) {
-          console.log(`🎯 Creating BUDGET MILESTONE (${milestoneType}%) notification`);
+          console.log(`dYZ_ Creating BUDGET MILESTONE (${milestoneType}%) notification`);
           await supabase.from('notifications').insert({
             user_id: userId,
             title: `Budget Milestone: ${milestoneType}%`,
@@ -136,11 +141,45 @@ export const triggerNotification = async (userId, transactions, baseCurrency) =>
             }
           });
         } else {
-          console.log(`ℹ️ Budget milestone (${milestoneType}%) notification already exists`);
+          console.log(`Г,1Л,? Budget milestone (${milestoneType}%) notification already exists`);
         }
       }
     }
   } catch (error) {
     console.error('Error checking budget notifications:', error);
+  }
+};
+
+/**
+ * Create a transaction-level notification (on add/update) if enabled.
+ */
+export const createTransactionNotification = async (userId, transaction, baseCurrency, preferences = {}) => {
+  if (preferences.transactionAlerts === false) {
+    console.log('Transaction alerts disabled in settings, skipping transaction notification.');
+    return;
+  }
+
+  const isExpense = transaction.type === 'expense';
+  const amountAbs = Math.abs(Number(transaction.amount) || 0).toFixed(2);
+  const direction = isExpense ? 'Expense' : 'Income';
+  const title = isExpense ? 'Expense Recorded' : 'Income Recorded';
+  const message = `${direction}: ${transaction.category || 'Uncategorized'} • ${transaction.currency || baseCurrency} ${amountAbs} on ${transaction.date}`;
+
+  try {
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      title,
+      message,
+      type: 'transaction_alert',
+      metadata: {
+        transaction_id: transaction.id,
+        category: transaction.category,
+        amount: amountAbs,
+        currency: transaction.currency || baseCurrency,
+        type: transaction.type
+      }
+    });
+  } catch (error) {
+    console.error('Error creating transaction notification:', error);
   }
 };

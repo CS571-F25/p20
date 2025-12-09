@@ -7,7 +7,7 @@ import { useSettings } from '../contexts/SettingsContext';
 import TransactionSummary from "./TransactionSummary";
 import AppCard from '../reusable/AppCard';
 import ClickOutsideWrapper from '../reusable/ClickOutsideWrapper';
-import { triggerNotification } from '../notifications/triggerNotification';
+import { triggerNotification, createTransactionNotification } from '../notifications/triggerNotification';
 import './Transactions.css';
 
 export default function Transactions() {
@@ -265,8 +265,11 @@ export default function Transactions() {
       setTransactions(updatedTransactions);
     
       // notifications!
+      if (settings?.notifications?.transactionAlerts) {
+        await createTransactionNotification(user.id, data[0], defaultCurrency, settings.notifications);
+      }
       if (formData.type === 'expense') {
-        await triggerNotification(user.id, updatedTransactions, defaultCurrency);
+        await triggerNotification(user.id, updatedTransactions, defaultCurrency, settings.notifications);
       }
 
       toast.success('Transaction added successfully!', {
@@ -398,8 +401,14 @@ export default function Transactions() {
       setTransactions(updatedTransactions);
       
       // Check budget notifications with updated transactions
+      if (settings?.notifications?.transactionAlerts) {
+        const editedTx = updatedTransactions.find(t => t.id === id);
+        if (editedTx) {
+          await createTransactionNotification(user.id, editedTx, defaultCurrency, settings.notifications);
+        }
+      }
       if (editFormData.type === 'expense') {
-        await triggerNotification(user.id, updatedTransactions, defaultCurrency);
+        await triggerNotification(user.id, updatedTransactions, defaultCurrency, settings.notifications);
       }
 
       toast.info('Transaction updated successfully!', {

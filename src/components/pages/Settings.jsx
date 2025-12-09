@@ -16,7 +16,6 @@ export default function Settings(props) {
     const [showCurrencyWarning, setShowCurrencyWarning] = useState(false);
     const [pendingCurrency, setPendingCurrency] = useState('');
     
-    // Settings state
     const [currency, setCurrency] = useState('USD');
     const [theme, setTheme] = useState('light');
     const [notifications, setNotifications] = useState({
@@ -64,13 +63,13 @@ export default function Settings(props) {
         } catch (error) {
             console.error('Error loading settings:', error);
             toast.error('Failed to load settings', {
-            position: "top-right",
-            autoClose: 2000, // disappears after 2 seconds
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-        });
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+            });
         } finally {
             setLoading(false);
         }
@@ -78,65 +77,60 @@ export default function Settings(props) {
 
     const handleCurrencyChange = (e) => {
         const newCurrency = e.target.value;
-        
-        // If changing from current currency, show warning
         if (newCurrency !== currency) {
             setPendingCurrency(newCurrency);
             setShowCurrencyWarning(true);
-    }
+        }
     };
 
     const confirmCurrencyChange = () => {
-    setCurrency(pendingCurrency);
-    setShowCurrencyWarning(false);
-    setPendingCurrency('');
+        setCurrency(pendingCurrency);
+        setShowCurrencyWarning(false);
+        setPendingCurrency('');
     };
 
     const cancelCurrencyChange = () => {
-    setShowCurrencyWarning(false);
-    setPendingCurrency('');
+        setShowCurrencyWarning(false);
+        setPendingCurrency('');
     };
 
     const saveSettings = async () => {
         try {
-        setSaving(true);
+            setSaving(true);
 
-        const settingsData = {
-            currency,
-            theme,
-            notifications,
-        };
+            const settingsData = {
+                currency,
+                theme,
+                notifications,
+            };
 
-        // Use the context's updateSettings function
-        const result = await updateContextSettings(settingsData);
+            const result = await updateContextSettings(settingsData);
+            if (!result.success) throw result.error;
 
-        if (!result.success) throw result.error;
-
-        toast.success('Settings saved successfully!', {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-        });
-        
-        document.documentElement.setAttribute('data-theme', theme);
+            toast.success('Settings saved successfully!', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+            });
+            
+            document.documentElement.setAttribute('data-theme', theme);
         } catch (error) {
-        console.error('Error saving settings:', error);
-        toast.error('Failed to save settings', {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-        });
+            console.error('Error saving settings:', error);
+            toast.error('Failed to save settings', {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+            });
         } finally {
-        setSaving(false);
+            setSaving(false);
         }
     };
-
 
     const handleThemeChange = (selectedTheme) => {
         setTheme(selectedTheme);
@@ -167,34 +161,37 @@ export default function Settings(props) {
             <div className="settings-page">
 
                 <div className="row">
-                    {/* Currency Settings */}
                     <div>
                         <AppCard width="100%" >
                             <div className="default-currency">
                                 <div>
-                                    <h3>💱 Default Currency</h3>
+                                    <h3>Default Currency</h3>
                                     <p className="setting-description">
                                         Select your preferred currency for displaying amounts throughout the app.
                                     </p>
                                 </div>
-                                <select
-                                value={currency}
-                                onChange={handleCurrencyChange}
-                                className="currency-select"
-                                >
-                                {currencies.map(curr => (
-                                    <option key={curr}>{curr}</option>
-                                ))}
-                                </select>
+                                <div>
+                                    <label className="sr-only" htmlFor="currency-select">
+                                        Choose your default currency
+                                    </label>
+                                    <select
+                                        id="currency-select"
+                                        value={currency}
+                                        onChange={handleCurrencyChange}
+                                        className="currency-select"
+                                    >
+                                        {currencies.map(curr => (
+                                            <option key={curr}>{curr}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </AppCard>
                     </div>
 
-            
-                    {/* Notification Settings */}
                     <div>
                         <AppCard width="100%" marginTop="25px">
-                            <h3>🔔 Notification Preferences</h3>
+                            <h3>Notification Preferences</h3>
                             <p className="setting-description">
                                 Manage how and when you receive notifications.
                             </p>
@@ -206,8 +203,11 @@ export default function Settings(props) {
                                         <div className="notification-description">Receive important updates via email</div>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => handleNotificationToggle('emailAlerts')}
                                         className={`toggle-switch ${notifications.emailAlerts ? 'active' : ''}`}
+                                        aria-pressed={notifications.emailAlerts}
+                                        aria-label={`Turn ${notifications.emailAlerts ? 'off' : 'on'} email alerts`}
                                     >
                                         <span className="toggle-slider" />
                                     </button>
@@ -219,8 +219,11 @@ export default function Settings(props) {
                                         <div className="notification-description">Get notified for each transaction</div>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => handleNotificationToggle('transactionAlerts')}
                                         className={`toggle-switch ${notifications.transactionAlerts ? 'active' : ''}`}
+                                        aria-pressed={notifications.transactionAlerts}
+                                        aria-label={`Turn ${notifications.transactionAlerts ? 'off' : 'on'} transaction alerts`}
                                     >
                                         <span className="toggle-slider" />
                                     </button>
@@ -232,8 +235,11 @@ export default function Settings(props) {
                                         <div className="notification-description">Alerts when approaching budget limits</div>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => handleNotificationToggle('budgetAlerts')}
                                         className={`toggle-switch ${notifications.budgetAlerts ? 'active' : ''}`}
+                                        aria-pressed={notifications.budgetAlerts}
+                                        aria-label={`Turn ${notifications.budgetAlerts ? 'off' : 'on'} budget alerts`}
                                     >
                                         <span className="toggle-slider" />
                                     </button>
@@ -245,8 +251,11 @@ export default function Settings(props) {
                                         <div className="notification-description">Receive a weekly summary of your finances</div>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => handleNotificationToggle('weeklyReport')}
                                         className={`toggle-switch ${notifications.weeklyReport ? 'active' : ''}`}
+                                        aria-pressed={notifications.weeklyReport}
+                                        aria-label={`Turn ${notifications.weeklyReport ? 'off' : 'on'} weekly report`}
                                     >
                                         <span className="toggle-slider" />
                                     </button>
@@ -256,7 +265,6 @@ export default function Settings(props) {
                     </div>
                 </div>
 
-                {/* Save Button */}
                 <div className="row">
                     <div className="col-12">
                         <div className="save-button-container">
@@ -265,70 +273,74 @@ export default function Settings(props) {
                                 disabled={saving}
                                 className="btn-add"
                                 style={{marginTop: "20px"}}
+                                type="button"
                             >
                                 {saving ? 'Saving...' : 'Save Settings'}
                             </button>
                         </div>
                     </div>
                 </div>
+
                 {showCurrencyWarning && (
                     <div className="modal-overlay" onClick={cancelCurrencyChange}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h3>⚠️ Change Default Currency?</h3>
-                        <p className="modal-description">
-                            Changing your default currency will affect how amounts are displayed throughout the app:
-                        </p>
-                        <ul style={{ 
-                            textAlign: 'left', 
-                            color: '#4a5568', 
-                            lineHeight: '1.8',
-                            marginBottom: '20px',
-                            paddingLeft: '20px'
-                        }}>
-                            <li>Transaction summary values</li>
-                            <li>Profile balance display</li>
-                            <li>All analytics graphs</li>
-                            <li>Budget spending amounts (not limits)</li>
-                            <li>Default currency in forms</li>
-                        </ul>
-                        <p style={{ 
-                            color: '#2d3748', 
-                            fontWeight: '600',
-                            marginBottom: '20px'
-                        }}>
-                            Your actual transaction amounts will not change, only how they're displayed.
-                        </p>
-                        <p style={{ 
-                            color: '#2d3748', 
-                            fontWeight: '600',
-                            marginBottom: '20px'
-                        }}>
-                            Note: Previous notifications will not be updated, as they were sent based on your currency at that time.
-                        </p>
-                        <p style={{ 
-                            color: '#2d3748', 
-                            fontWeight: '600',
-                            marginBottom: '20px'
-                        }}>
-                            Don't forget to click the save settings button to actually apply the changes!
-                        </p>
-                        <div className="modal-actions">
-                            <button 
-                            className="modal-button cancel"
-                            onClick={cancelCurrencyChange}
-                            >
-                            Cancel
-                            </button>
-                            <button 
-                            className="modal-button confirm"
-                            onClick={confirmCurrencyChange}
-                            >
-                            Change Currency
-                            </button>
-                        </div>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="currency-warning-title">
+                            <h3 id="currency-warning-title">Change Default Currency?</h3>
+                            <p className="modal-description">
+                                Changing your default currency will affect how amounts are displayed throughout the app:
+                            </p>
+                            <ul style={{ 
+                                textAlign: 'left', 
+                                color: '#4a5568', 
+                                lineHeight: '1.8',
+                                marginBottom: '20px',
+                                paddingLeft: '20px'
+                            }}>
+                                <li>Transaction summary values</li>
+                                <li>Profile balance display</li>
+                                <li>All analytics graphs</li>
+                                <li>Budget spending amounts (not limits)</li>
+                                <li>Default currency in forms</li>
+                            </ul>
+                            <p style={{ 
+                                color: '#2d3748', 
+                                fontWeight: '600',
+                                marginBottom: '20px'
+                            }}>
+                                Your actual transaction amounts will not change, only how they're displayed.
+                            </p>
+                            <p style={{ 
+                                color: '#2d3748', 
+                                fontWeight: '600',
+                                marginBottom: '20px'
+                            }}>
+                                Note: Previous notifications will not be updated, as they were sent based on your currency at that time.
+                            </p>
+                            <p style={{ 
+                                color: '#2d3748', 
+                                fontWeight: '600',
+                                marginBottom: '20px'
+                            }}>
+                                Don't forget to click the save settings button to actually apply the changes!
+                            </p>
+                            <div className="modal-actions">
+                                <button 
+                                    className="modal-button cancel"
+                                    onClick={cancelCurrencyChange}
+                                    type="button"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    className="modal-button confirm"
+                                    onClick={confirmCurrencyChange}
+                                    type="button"
+                                >
+                                    Change Currency
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    )}
+                )}
             </div>
         </div>
     );
