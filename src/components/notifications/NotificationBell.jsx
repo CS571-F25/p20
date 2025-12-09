@@ -124,17 +124,17 @@ function NotificationBell() {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'budget_exceeded':
-        return '!';
+        return '🚨';
       case 'budget_warning':
-        return '⚠';
+        return '⚠️';
       case 'savings_goal_achieved':
-        return '*';
+        return '🎉';
       case 'budget_milestone':
-        return 'M';
+        return '🎯';
       case 'transaction_alert':
-        return '$';
+        return '💰';
       default:
-        return '•';
+        return '🔔';
     }
   };
 

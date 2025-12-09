@@ -4,6 +4,8 @@ import trackTransactionsImg from '../../assets/transactions.png';
 import budgetImg from '../../assets/budget.png';
 import notiImg from '../../assets/notifications.png';
 import logo from '../../assets/logo.png';
+import dashboardImg from '../../assets/dashboard.png';
+import piechartImg from "../../assets/piechart.png"
 
 
 export default function Home() {
@@ -198,6 +200,10 @@ export default function Home() {
         .section-header {
           text-align: center;
           margin-bottom: 60px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
         }
 
         .section-title {
@@ -549,9 +555,11 @@ export default function Home() {
             </div>
 
             <div className="hero-image">
-              <div className="image-placeholder" aria-hidden="true">
-                📊 Dashboard Screenshot Preview
-              </div>
+              <img 
+                src={dashboardImg} 
+                alt="A preview of the dashboard page of WalletPalz"
+                style={{ width: '100%', borderRadius: '8px', border: '2px solid #cbd5e1' }}
+              />
             </div>
           </div>
         </section>
@@ -697,12 +705,11 @@ export default function Home() {
                 <h3 className="screenshot-title">
                   <span aria-hidden="true">📊</span> Analytics Charts
                 </h3>
-                <div className="image-placeholder" aria-label="Placeholder for spending trends graph showing weekly and monthly spending breakdowns">
-                  <span aria-hidden="true">
-                    Spending Trends Graph<br />
-                    <small style={{ opacity: 0.7 }}>Weekly and monthly spending breakdowns</small>
-                  </span>
-                </div>
+                  <img 
+                    src={piechartImg} 
+                    alt="Piechart of transaction based on category image"
+                    style={{ width: '100%', borderRadius: '8px', border: '2px solid #cbd5e1' }}
+                  />
               </article>
 
               <article className="screenshot-card">

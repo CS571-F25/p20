@@ -17,6 +17,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useSettings } from "../contexts/SettingsContext";
 import { fetchExchangeRates, convertToBase } from "../reusable/currencyConverter";
 import "./Dashboard.css";
+import { AlignLeft } from "lucide-react";
 
 const CATEGORY_COLORS = ["#2563eb", "#22c55e", "#f97316", "#a855f7", "#06b6d4", "#ef4444"];
 const RADIAN = Math.PI / 180;
@@ -238,10 +239,10 @@ export default function Dashboard() {
         </div>
         <div className="metric-grid">
           <div className="metric-card primary">
-            <span className="label">Balance</span>
+            <span className="label">Balance (Overall)</span>
             <p className="metric-value">{formatAmount(totals.balance)}</p>
             <p className="muted">
-              Income {formatAmount(totals.income)} | Expenses {formatAmount(totals.expense)}
+              Income: {formatAmount(totals.income)} <br />Expenses: {formatAmount(totals.expense)}
             </p>
           </div>
           <div className="metric-card">
@@ -280,8 +281,8 @@ export default function Dashboard() {
         <article className="chart-card span-2" aria-labelledby="monthly-trend-title">
           <div className="card-header">
             <div>
-              <h2 id="monthly-trend-title">Monthly Trend</h2>
-              <p className="muted">Income vs. expenses (last 6 months)</p>
+              <h2 style={{ textAlign: "left"}} id="monthly-trend-title">Monthly Trend</h2>
+              <p style={{ textAlign: "left", marginBottom: "10px"}} className="muted">Income vs. expenses (last 6 months)</p>
             </div>
           </div>
           <div style={{ width: "100%", height: 260 }}>
@@ -290,10 +291,17 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="month" tickLine={false} axisLine={false} />
                 <YAxis tickLine={false} axisLine={false} />
-                <Tooltip />
+                <Tooltip 
+                  formatter={(value) => formatAmount(value)}
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px'
+                  }}
+                />
                 <Legend />
-                <Line type="monotone" dataKey="income" stroke="#22c55e" strokeWidth={3} dot={false} />
-                <Line type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={3} dot={false} />
+                <Line type="linear" dataKey="income" stroke="#22c55e" strokeWidth={3} dot={true} />
+                <Line type="linear" dataKey="expense" stroke="#ef4444" strokeWidth={3} dot={true} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -303,9 +311,12 @@ export default function Dashboard() {
           <div className="card-header">
             <div>
               <h2 id="category-breakdown-title">Spending by Category</h2>
-              <p className="muted">Top categories (expenses)</p>
+              <p style={{ textAlign: "left", marginBottom: "10px"}} className="muted">Top categories (expenses)</p>
             </div>
           </div>
+          {categoryBreakdown.length === 0 ? (
+            <p className="muted">No expenses yet.</p>
+          ) : (
           <div className="category-grid">
             <div style={{ width: "100%", height: 240 }}>
               <ResponsiveContainer>
@@ -317,6 +328,7 @@ export default function Dashboard() {
                     outerRadius={90}
                     labelLine={false}
                     label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                      if (percent < 0.05) return null;
                       const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
                       const x = cx + radius * Math.cos(-midAngle * RADIAN);
                       const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -344,11 +356,8 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </div>
             <div className="category-list">
-              {categoryBreakdown.length === 0 ? (
-                <p className="muted">No expenses yet.</p>
-              ) : (
-                categoryBreakdown.map((item, index) => (
-                  <div key={item.name} className="category-row">
+              {categoryBreakdown.map((item, index) => (
+                  <div key={item.name} className="category-row" style={{ textAlign: "left" }}>
                     <span className="dot" style={{ background: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }}></span>
                     <div>
                       <p className="label">{item.name}</p>
@@ -356,9 +365,10 @@ export default function Dashboard() {
                     </div>
                   </div>
                 ))
-              )}
+              }
             </div>
           </div>
+          )}
         </article>
       </section>
 
@@ -367,18 +377,18 @@ export default function Dashboard() {
           <div className="card-header">
             <div>
               <h2 id="budget-health-title">Budget Health</h2>
-              <p className="muted">Spending against your limits</p>
+              <p style={{ textAlign: "left", marginBottom: "10px"}} className="muted">Spending against your limits</p>
             </div>
           </div>
           {budgetProgress.length === 0 ? (
-            <p className="muted">You have not created any budgets yet.</p>
+            <p className="muted">No budgets yet.</p>
           ) : (
             <div className="budget-list">
               {budgetProgress.slice(0, 4).map((budget) => (
                 <div key={budget.id} className="budget-row">
                   <div className="budget-row-header">
                     <div>
-                      <p className="label">{budget.categories?.join(", ") || "Uncategorized"}</p>
+                      <p style={{ textAlign: "left" }} className="label">{budget.categories?.join(", ") || "Uncategorized"}</p>
                       <p className="muted">
                         {budget.start_date} - {budget.end_date}
                       </p>
@@ -413,7 +423,7 @@ export default function Dashboard() {
           <div className="card-header">
             <div>
               <h2 id="recent-transactions-title">Recent Transactions</h2>
-              <p className="muted">Latest activity</p>
+              <p style={{ textAlign: "left", marginBottom: "10px" }} className="muted">Latest activity</p>
             </div>
           </div>
           {recentTransactions.length === 0 ? (
@@ -422,7 +432,7 @@ export default function Dashboard() {
             <div className="recent-list">
               {recentTransactions.map((t) => (
                 <div key={t.id} className="recent-row">
-                  <div>
+                  <div style={{ textAlign: "left" }}>
                     <p className="label">{t.description}</p>
                     <p className="muted">
                       {t.category || "Uncategorized"} | {t.displayDate}

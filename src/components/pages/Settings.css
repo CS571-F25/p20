@@ -25,7 +25,7 @@
 
 /* Setting Description */
 .setting-description {
-  color: #718096;
+  color: #393c42;
   margin-bottom: 15px;
   margin-left: 6px;
   font-size: 0.95em;
@@ -133,7 +133,7 @@
 
 .notification-description {
   font-size: 0.9em;
-  color: #718096;
+  color: #393c42;
 }
 
 /* Toggle Switch */
@@ -187,7 +187,7 @@
 
 /* Reusing btn-add style from transactions */
 .save-button-container .btn-add {
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  background-color: #2563eb; /* Changed from #4299e1 for better contrast */
   color: white;
   border: none;
   padding: 14px 32px;
@@ -285,7 +285,7 @@
 }
 
 .modal-button.confirm {
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  background-color: #2563eb; /* Changed from #4299e1 for better contrast */
   color: white;
   box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
 }
